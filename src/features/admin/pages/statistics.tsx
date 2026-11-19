@@ -56,6 +56,7 @@ const messages = defineMessages({
     totals: '总览',
     trends: '趋势',
     inRange: '所选范围合计',
+    trendsUnsupported: '当前 Worker 版本不支持趋势统计，升级到 v1.14.0 及以上后可查看。',
   },
   en: {
     title: 'Statistics',
@@ -84,6 +85,7 @@ const messages = defineMessages({
     totals: 'Totals',
     trends: 'Trends',
     inRange: 'Total in range',
+    trendsUnsupported: 'This worker version does not provide trends. Upgrade it to v1.14.0 or later to see them.',
   },
 })
 
@@ -97,10 +99,9 @@ type TotalMetric =
   | 'activeUserCount7days'
   | 'activeUserCount30days'
 type Totals = Partial<Record<TotalMetric, number>>
-type StatisticsResponse = {
-  totals?: Totals
-  trends: Record<TrendMetric, { day: string; count: number }[]>
-}
+type Trends = Record<TrendMetric, { day: string; count: number }[]>
+/** Workers before v1.14.0 ignore the query and return the totals object itself. */
+type StatisticsResponse = { totals?: Totals; trends: Trends } | Totals
 type DailyPoint = { day: string } & Record<TrendMetric, number>
 
 const TOTAL_METRICS: { key: TotalMetric; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -140,7 +141,7 @@ const dayToLocal = (day: string) => {
 const localToDay = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-function buildDaily(trends: StatisticsResponse['trends'], from: string, endDay: string): DailyPoint[] {
+function buildDaily(trends: Trends, from: string, endDay: string): DailyPoint[] {
   const counts = (Object.keys(trends) as TrendMetric[]).map(
     (key) => [key, new Map((trends[key] || []).map((row) => [row.day, row.count]))] as const,
   )
@@ -334,12 +335,16 @@ export default function StatisticsPage() {
       const endDay = addDays(to, 1)
       const params = new URLSearchParams({ from: `${from} 00:00:00`, to: `${endDay} 00:00:00`, granularity: 'day' })
       if (includeTotals) params.set('includeTotals', 'true')
-      const data = await api.get<StatisticsResponse>(`/admin/statistics?${params}`)
+      const res = await api.get<StatisticsResponse>(`/admin/statistics?${params}`)
+      const data = 'trends' in res && res.trends ? res : { totals: res as Totals, trends: null }
       if (data.totals) {
         totalsRef.current = data.totals
         totalsVersion.current = version
       }
-      return { daily: buildDaily(data.trends, from, endDay), totals: data.totals ?? totalsRef.current }
+      return {
+        daily: data.trends ? buildDaily(data.trends, from, endDay) : null,
+        totals: data.totals ?? totalsRef.current,
+      }
     },
     placeholderData: keepPreviousData,
     staleTime: 60_000,
@@ -347,6 +352,7 @@ export default function StatisticsPage() {
 
   const totals = query.data?.totals
   const daily = query.data?.daily
+  const trendsUnsupported = query.data?.daily === null
   const loading = query.isFetching
 
   const selectPreset = (days: number) => {
@@ -370,7 +376,7 @@ export default function StatisticsPage() {
             <RangePicker
               range={range}
               preset={preset}
-              disabled={loading}
+              disabled={loading || trendsUnsupported}
               onPreset={selectPreset}
               onApply={(next) => {
                 if (next[0] === from && next[1] === to) return
@@ -416,6 +422,12 @@ export default function StatisticsPage() {
       </section>
 
       <Separator />
+
+      {trendsUnsupported && (
+        <Alert>
+          <AlertDescription>{t('trendsUnsupported')}</AlertDescription>
+        </Alert>
+      )}
 
       <section aria-label={t('trends')} className="grid gap-4 md:grid-cols-2">
         {query.isLoading
