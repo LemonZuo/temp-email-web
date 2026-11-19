@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef } from 'react'
 import { RotateCwIcon } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { Button } from '@/components/ui/button'
 import { useApp } from '@/store/app'
 import { useLocale, useT } from '@/i18n'

@@ -51,27 +51,22 @@ const toPreview = (text: string, html: string) => {
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-/**
- * Parses a raw RFC822 mail in the browser. Object URLs created for attachments live as long
- * as the page; mail lists are small so we accept that instead of tracking revocation.
- */
-export async function parseMail(item: RawMail): Promise<ParsedMail> {
-  const originalSource = item.source || ''
-  const result: ParsedMail = {
-    ...item,
+type ParsedContent = Pick<ParsedMail, 'sender' | 'senderName' | 'senderAddress' | 'subject' | 'message' | 'text' | 'preview' | 'attachments'>
+
+/** Parses the raw source; the rest of the row (read state, metadata ...) is merged in by `parseMail`. */
+async function parseContent(raw: string, originalSource: string): Promise<ParsedContent> {
+  const result: ParsedContent = {
     sender: originalSource,
     senderName: '',
     senderAddress: originalSource,
-    originalSource,
     subject: '',
     message: '',
     text: '',
     preview: '',
     attachments: [],
   }
-  if (!item.raw) return result
   try {
-    const parsed = await PostalMime.parse(item.raw)
+    const parsed = await PostalMime.parse(raw)
     const fromAddress = parsed.from?.address || originalSource
     const fromName = parsed.from?.name || ''
     result.senderAddress = fromAddress
@@ -102,30 +97,68 @@ export async function parseMail(item: RawMail): Promise<ParsedMail> {
     result.preview = toPreview(result.text, message)
   } catch (error) {
     console.error('Failed to parse mail', error)
-    result.text = item.raw
-    result.preview = item.raw.slice(0, 200)
+    result.text = raw
+    result.preview = raw.slice(0, 200)
   }
   return result
 }
 
+
+/**
+ * Parsed content per mail, so refetches (auto refresh) reuse the same attachment object URLs instead of
+ * creating new ones every time. Least recently used entries are dropped and their URLs revoked.
+ */
+const CONTENT_CACHE_LIMIT = 300
+const contentCache = new Map<string, Promise<ParsedContent>>()
+
+function cachedContent(item: RawMail & { raw: string }) {
+  if (item.id == null) return parseContent(item.raw, item.source || '')
+  const key = `${item.id}:${item.raw.length}`
+  const hit = contentCache.get(key)
+  if (hit) {
+    contentCache.delete(key)
+    contentCache.set(key, hit)
+    return hit
+  }
+  const entry = parseContent(item.raw, item.source || '')
+  contentCache.set(key, entry)
+  while (contentCache.size > CONTENT_CACHE_LIMIT) {
+    const [oldestKey, oldest] = contentCache.entries().next().value!
+    contentCache.delete(oldestKey)
+    void oldest.then((c) => c.attachments.forEach((a) => URL.revokeObjectURL(a.url))).catch(() => undefined)
+  }
+  return entry
+}
+
+/** Parses a raw RFC822 mail in the browser (cid: images are rewritten to blob: URLs). */
+export async function parseMail(item: RawMail): Promise<ParsedMail> {
+  const originalSource = item.source || ''
+  const base = {
+    ...item,
+    sender: originalSource,
+    senderName: '',
+    senderAddress: originalSource,
+    originalSource,
+    subject: '',
+    message: '',
+    text: '',
+    preview: '',
+    attachments: [],
+  }
+  if (!item.raw) return base
+  return { ...base, ...(await cachedContent(item as RawMail & { raw: string })) }
+}
+
 export const parseMails = (items: RawMail[]) => Promise.all(items.map(parseMail))
 
-export const getEmlDownloadUrl = (raw: string | undefined) =>
-  URL.createObjectURL(new Blob([raw || ''], { type: 'message/rfc822' }))
-
-/** `metadata.ai_extract` written by the worker's AI extraction feature. */
-export type AiExtract = {
-  type: 'auth_code' | 'auth_link' | 'service_link' | 'subscription_link' | 'other_link' | string
-  result: string
-  result_text?: string
+/** Downloads the raw source as `<name>.eml` (the object URL is created on demand and revoked afterwards). */
+export function downloadEml(raw: string | undefined, name: string) {
+  const url = URL.createObjectURL(new Blob([raw || ''], { type: 'message/rfc822' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
 
-export const getAiExtract = (metadata: string | null | undefined): AiExtract | null => {
-  if (!metadata) return null
-  try {
-    const data = JSON.parse(metadata)
-    return data?.ai_extract?.result ? data.ai_extract : null
-  } catch {
-    return null
-  }
-}
+export { getAiExtract, type AiExtract } from './ai-extract'

@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { RouterProvider } from 'react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ConfirmHost } from '@/components/common/confirm'
@@ -9,10 +8,23 @@ import { SiteAuthDialog } from '@/components/common/auth-dialogs'
 import { AnnouncementToast } from '@/components/common/announcement'
 import { FullScreenFallback } from '@/components/common/route-fallback'
 import { loadOpenSettings, loadUserSettings } from '@/lib/api'
+import { APP_CONFIG } from '@/lib/config'
 import { queryClient } from '@/lib/query-client'
 import { useApp } from '@/store/app'
 import { useLocale } from '@/i18n'
 import { router } from './router'
+
+/** Telegram Mini App builds need `window.Telegram.WebApp` before any page renders. */
+const loadTelegramScript = () =>
+  APP_CONFIG.IS_TELEGRAM
+    ? new Promise<void>((resolve) => {
+        const script = document.createElement('script')
+        script.src = 'https://telegram.org/js/telegram-web-app.js'
+        script.onload = () => resolve()
+        script.onerror = () => resolve()
+        document.head.appendChild(script)
+      })
+    : Promise.resolve()
 
 function Bootstrap() {
   const fetched = useApp((s) => s.openSettings.fetched)
@@ -20,7 +32,9 @@ function Bootstrap() {
   const locale = useLocale()
 
   useEffect(() => {
-    loadOpenSettings().then(() => loadUserSettings())
+    loadTelegramScript()
+      .then(() => loadOpenSettings())
+      .then(() => loadUserSettings())
   }, [])
 
   useEffect(() => {
@@ -36,16 +50,14 @@ function Bootstrap() {
 
 export default function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider delayDuration={300}>
-          <Bootstrap />
-          <SiteAuthDialog />
-          <ConfirmHost />
-          <AnnouncementToast />
-          <Toaster position="top-center" richColors closeButton />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider delayDuration={300}>
+        <Bootstrap />
+        <SiteAuthDialog />
+        <ConfirmHost />
+        <AnnouncementToast />
+        <Toaster position="top-center" richColors closeButton />
+      </TooltipProvider>
+    </QueryClientProvider>
   )
 }

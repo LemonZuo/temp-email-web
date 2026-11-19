@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Outlet, useNavigate } from 'react-router'
 import { ChevronsUpDownIcon, InboxIcon, LogOutIcon, MailsIcon, PenSquareIcon, SendIcon, SettingsIcon } from 'lucide-react'
 import { AppShell, type NavGroup } from '@/components/layout/app-shell'
-import { RouteFallback } from '@/components/common/route-fallback'
+import { FullScreenFallback, RouteFallback } from '@/components/common/route-fallback'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { SenderAvatar } from '@/components/mail/mail-list'
-import { useApp, useFlags, DEFAULT_USER_SETTINGS } from '@/store/app'
+import { useApp, useFlags } from '@/store/app'
 import { useAuth } from '@/store/auth'
 import { defineMessages, useT } from '@/i18n'
+import { logoutUser } from './session'
+
 
 const UserLoginPage = lazy(() => import('./pages/login'))
 
@@ -40,16 +42,11 @@ const messages = defineMessages({
   },
 })
 
-export function logoutUser() {
-  useAuth.getState().setUserJwt('')
-  useApp.getState().set({ userSettings: { ...DEFAULT_USER_SETTINGS, fetched: true } })
-}
-
 function NavUser() {
   const t = useT(messages)
   const navigate = useNavigate()
   const { isMobile } = useSidebar()
-  const { user_email, is_admin } = useApp((s) => s.userSettings)
+  const { user_email, is_admin, user_role } = useApp((s) => s.userSettings)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -59,7 +56,9 @@ function NavUser() {
               <SenderAvatar name={user_email} className="size-8 rounded-lg" />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user_email}</span>
-                <span className="truncate text-xs text-muted-foreground">{is_admin ? t('admin') : t('account')}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {is_admin ? t('admin') : user_role?.role || t('account')}
+                </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -92,13 +91,16 @@ export default function UserLayout() {
   const t = useT(messages)
   const userJwt = useAuth((s) => s.userJwt)
   const openSettings = useApp((s) => s.openSettings)
+  const { fetched: userFetched, user_email } = useApp((s) => s.userSettings)
   const { showUserSystem } = useFlags()
 
   if (openSettings.fetched && !showUserSystem) return <Navigate to="/" replace />
-  if (!userJwt) {
+  if (userJwt && !userFetched) return <FullScreenFallback />
+  // No session, or the stored JWT could not be verified (expired / deleted account / network error).
+  if (!userJwt || !user_email) {
     return (
-      <Suspense fallback={<RouteFallback />}>
-        <UserLoginPage />
+      <Suspense fallback={<FullScreenFallback />}>
+        <UserLoginPage sessionExpired={!!userJwt} />
       </Suspense>
     )
   }

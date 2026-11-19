@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -223,18 +223,16 @@ function Toolbar({ editor }: { editor: Editor }) {
 }
 
 /**
- * WYSIWYG HTML editor. `value` is only applied on mount and whenever `resetKey` changes
- * (e.g. reply/forward replaced the draft) to avoid fighting the cursor while typing.
+ * WYSIWYG HTML editor. `value` is only applied on mount (to avoid fighting the cursor while typing);
+ * give it a new `key` to load different content (e.g. reply/forward replaced the draft).
  */
 export function RichEditor({
   value,
   onChange,
-  resetKey,
   className,
 }: {
   value: string
   onChange: (html: string) => void
-  resetKey?: unknown
   className?: string
 }) {
   const t = useT(messages)
@@ -253,11 +251,6 @@ export function RichEditor({
       },
     },
   })
-
-  useEffect(() => {
-    if (editor && resetKey !== undefined) editor.commands.setContent(value || '', { emitUpdate: false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, resetKey])
 
   if (!editor) return null
   return (

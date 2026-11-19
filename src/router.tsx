@@ -1,8 +1,11 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, useLocation, type RouteObject } from 'react-router'
 import { FullScreenFallback } from '@/components/common/route-fallback'
+import { RouteError } from '@/components/common/route-error'
 import { isLocale, setLocale } from '@/i18n'
+import { useApp } from '@/store/app'
 import MailboxLayout from '@/features/mailbox/layout'
+import { ADMIN_BASE } from '@/features/admin/paths'
 
 const page = (loader: () => Promise<{ default: React.ComponentType }>) => {
   const Component = lazy(loader)
@@ -28,14 +31,26 @@ function LegacyLocaleRedirect() {
   return <Navigate to={`/${rest.join('/')}${location.search}${location.hash}`} replace />
 }
 
+/** Sent / compose pages only exist when sending mail is enabled (like the old frontend's hidden tabs). */
+function RequireSendMail({ fallback, children }: { fallback: string; children: React.ReactNode }) {
+  const enabled = useApp((s) => s.openSettings.enableSendMail)
+  return enabled ? children : <Navigate to={fallback} replace />
+}
+
+/** The old frontend's admin page lived at `/admin`; the console now lives at {@link ADMIN_BASE}. */
+function AdminRedirect() {
+  const location = useLocation()
+  return <Navigate to={`${ADMIN_BASE}${location.search}${location.hash}`} replace />
+}
+
 const routes: RouteObject[] = [
   {
     path: '/',
     element: <MailboxLayout />,
     children: [
       { index: true, element: page(() => import('@/features/mailbox/pages/inbox')) },
-      { path: 'sent', element: page(() => import('@/features/mailbox/pages/sent')) },
-      { path: 'compose', element: page(() => import('@/features/mailbox/pages/compose')) },
+      { path: 'sent', element: <RequireSendMail fallback="/">{page(() => import('@/features/mailbox/pages/sent'))}</RequireSendMail> },
+      { path: 'compose', element: <RequireSendMail fallback="/">{page(() => import('@/features/mailbox/pages/compose'))}</RequireSendMail> },
       { path: 'settings', element: page(() => import('@/features/mailbox/pages/settings')) },
       { path: 'auto-reply', element: page(() => import('@/features/mailbox/pages/auto-reply')) },
       { path: 'webhook', element: page(() => import('@/features/webhook/mailbox-webhook-page')) },
@@ -54,13 +69,14 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: page(() => import('@/features/user/pages/addresses')) },
       { path: 'mails', element: page(() => import('@/features/user/pages/mails')) },
-      { path: 'sent', element: page(() => import('@/features/user/pages/sent')) },
-      { path: 'compose', element: page(() => import('@/features/user/pages/compose')) },
+      { path: 'sent', element: <RequireSendMail fallback="/user">{page(() => import('@/features/user/pages/sent'))}</RequireSendMail> },
+      { path: 'compose', element: <RequireSendMail fallback="/user">{page(() => import('@/features/user/pages/compose'))}</RequireSendMail> },
       { path: 'settings', element: page(() => import('@/features/user/pages/settings')) },
     ],
   },
+  { path: '/admin', element: <AdminRedirect /> },
   {
-    path: '/admin',
+    path: ADMIN_BASE,
     element: standalone(() => import('@/features/admin/layout')),
     children: [
       { index: true, element: page(() => import('@/features/admin/pages/statistics')) },
@@ -93,4 +109,4 @@ const routes: RouteObject[] = [
   { path: '*', element: <Navigate to="/" replace /> },
 ]
 
-export const router = createBrowserRouter(routes)
+export const router = createBrowserRouter([{ errorElement: <RouteError />, children: routes }])

@@ -12,7 +12,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { PasswordInput } from '@/components/common/password-input'
 import { Turnstile, type TurnstileHandle } from '@/components/common/turnstile'
-import { api, bindAddressToUser, loadAddressSettings } from '@/lib/api'
+import { api, bindAddressToUser } from '@/lib/api'
+import { switchAddress } from '@/lib/session'
 import { hashPassword } from '@/lib/crypto'
 import { EXPIRY_MODES, resolveExpiryPayload, type ExpiryMode } from '@/lib/expiry'
 import { errorMessage } from '@/lib/format'
@@ -108,18 +109,23 @@ const ADJECTIVES = ['quick', 'lazy', 'happy', 'brave', 'calm', 'eager', 'fancy',
 const NOUNS = ['fox', 'panda', 'tiger', 'otter', 'eagle', 'koala', 'whale', 'lion', 'falcon', 'badger', 'cobra', 'dolphin', 'gecko', 'lemur', 'moose', 'raven', 'shark', 'wolf', 'yak', 'zebra']
 const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)]
 
-/** After a successful login/creation: bind to the logged-in user, ignore bind errors. */
-async function afterAddressLogin(bindErrorText: string) {
-  await loadAddressSettings().catch(() => undefined)
+/** Bind the current mailbox to the logged-in user; a bind failure only shows a toast. Returns whether it was bound. */
+async function bindQuietly(bindErrorText: string) {
   try {
-    await bindAddressToUser()
+    return await bindAddressToUser()
   } catch (error) {
     toast.error(`${bindErrorText}: ${errorMessage(error)}`)
+    return false
   }
 }
 
+export type AddressLoginResult = {
+  /** The mailbox was bound to the logged-in user (false when no user is logged in or binding failed) */
+  bound: boolean
+}
+
 /** Log in to an existing mailbox by credential (JWT) or by address + password. */
-export function AddressLoginForm({ onSuccess }: { onSuccess?: () => void }) {
+export function AddressLoginForm({ onSuccess }: { onSuccess?: (result: AddressLoginResult) => void }) {
   const t = useT(messages)
   const openSettings = useApp((s) => s.openSettings)
   const userEmail = useApp((s) => s.userSettings.user_email)
@@ -149,7 +155,7 @@ export function AddressLoginForm({ onSuccess }: { onSuccess?: () => void }) {
           password: await hashPassword(password),
           cf_token: cfToken,
         })
-        useAuth.getState().setJwt(res.jwt)
+        await switchAddress(res.jwt)
       } else {
         const value = credential.trim()
         if (!value) {
@@ -157,10 +163,10 @@ export function AddressLoginForm({ onSuccess }: { onSuccess?: () => void }) {
           return
         }
         await api.post('/open_api/credential_login', { credential: value, cf_token: cfToken })
-        useAuth.getState().setJwt(value)
+        await switchAddress(value)
       }
-      await afterAddressLogin(t('bindUserAddressError'))
-      onSuccess?.()
+      const bound = await bindQuietly(t('bindUserAddressError'))
+      onSuccess?.({ bound })
     } catch (error) {
       toast.error(errorMessage(error))
       turnstile.current?.refresh()
@@ -235,16 +241,22 @@ export type NewAddressBody = {
 
 /**
  * Create a new address. By default posts to `/api/new_address`, switches the current mailbox to it,
- * binds it to the logged-in user and opens the credential dialog.
+ * binds it to the logged-in user, opens the credential dialog, then calls `afterCreated`.
  */
 export function CreateAddressForm({
   newAddress,
   onCreated,
+  afterCreated,
+  showCredential = true,
   enableExpiry = true,
 }: {
   newAddress?: (body: NewAddressBody) => Promise<NewAddressResponse>
-  /** Override the default "switch to the new mailbox" behaviour */
+  /** Replaces the whole default flow (no switch / bind / credential dialog) */
   onCreated?: (res: NewAddressResponse) => void | Promise<void>
+  /** Runs after the default flow (e.g. close a dialog) */
+  afterCreated?: (res: NewAddressResponse, result: AddressLoginResult) => void | Promise<void>
+  /** Open the global credential dialog after creating (default true); turn off when showing your own */
+  showCredential?: boolean
   enableExpiry?: boolean
 }) {
   const t = useT(messages)
@@ -324,10 +336,11 @@ export function CreateAddressForm({
       if (onCreated) {
         await onCreated(res)
       } else {
-        useAuth.getState().setJwt(res.jwt)
+        await switchAddress(res.jwt)
         useAuth.getState().setAddressPassword(res.password || '')
-        await afterAddressLogin(t('bindUserAddressError'))
-        useApp.getState().set({ showCredential: true })
+        const bound = await bindQuietly(t('bindUserAddressError'))
+        if (showCredential) useApp.getState().set({ showCredential: true })
+        await afterCreated?.(res, { bound })
       }
       setName('')
     } catch (error) {

@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { CheckIcon, ChevronsUpDownIcon, InboxIcon, ShieldIcon, UserRoundIcon, type LucideIcon } from 'lucide-react'
 import {
   DropdownMenu,
@@ -8,19 +10,75 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { adminPath } from '@/features/admin/paths'
 import { useApp, useFlags } from '@/store/app'
 import { defineMessages, useT } from '@/i18n'
 
 export type ModuleKey = 'mailbox' | 'user' | 'admin' | 'other'
 
 const messages = defineMessages({
-  zh: { switchTo: '切换到', defaultTitle: '临时邮箱', other: '临时邮箱' },
-  en: { switchTo: 'Switch to', defaultTitle: 'Temp Email', other: 'Temp Email' },
+  zh: { switchTo: '切换到', defaultTitle: '临时邮箱', other: '临时邮箱', tapsLeft: '再点击 {n} 次进入管理后台', toAdmin: '进入管理后台' },
+  en: {
+    switchTo: 'Switch to',
+    defaultTitle: 'Temp Email',
+    other: 'Temp Email',
+    tapsLeft: '{n} more taps to open the admin console',
+    toAdmin: 'Opening the admin console',
+  },
 })
 
-export function Logo({ className = 'size-8' }: { className?: string }) {
+const ADMIN_TAPS = 5
+/** Taps further apart than this start a new count */
+const TAP_WINDOW_MS = 3000
+
+/**
+ * Hidden admin entry kept from the old frontend: tapping the site logo 5 times opens the admin console,
+ * which asks for the admin password when needed.
+ */
+function useAdminLogoTap() {
+  const t = useT(messages)
+  const navigate = useNavigate()
+  const taps = useRef({ count: 0, last: 0 })
+  return () => {
+    const now = Date.now()
+    const state = taps.current
+    state.count = now - state.last > TAP_WINDOW_MS ? 1 : state.count + 1
+    state.last = now
+    if (state.count >= ADMIN_TAPS) {
+      state.count = 0
+      toast(t('toAdmin'), { id: 'admin-logo-tap', duration: 1500 })
+      navigate(adminPath())
+    } else {
+      toast(t('tapsLeft', { n: ADMIN_TAPS - state.count }), { id: 'admin-logo-tap', duration: 1500 })
+    }
+  }
+}
+
+export function Logo({
+  className = 'size-8',
+  adminTap = true,
+  isolate = false,
+}: {
+  className?: string
+  /** Count taps towards the hidden admin entry (off inside the admin console) */
+  adminTap?: boolean
+  /** Keep taps from reaching a parent control (e.g. the module switcher's dropdown trigger) */
+  isolate?: boolean
+}) {
+  const onTap = useAdminLogoTap()
   return (
-    <div className={`flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground ${className}`}>
+    <div
+      className={`flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground select-none ${className}`}
+      onPointerDown={adminTap && isolate ? (e) => e.stopPropagation() : undefined}
+      onClick={
+        adminTap
+          ? (e) => {
+              if (isolate) e.stopPropagation()
+              onTap()
+            }
+          : undefined
+      }
+    >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-1/2" aria-hidden>
         <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z" />
         <path d="m4.5 7 7.5 6 7.5-6" />
@@ -34,13 +92,15 @@ export function Logo({ className = 'size-8' }: { className?: string }) {
 export function ModuleSwitcher({ current }: { current: ModuleKey }) {
   const t = useT(messages)
   const navigate = useNavigate()
-  const { isMobile } = useSidebar()
+  const { isMobile, state } = useSidebar()
   const title = useApp((s) => s.openSettings.title) || t('defaultTitle')
+  // When the sidebar is collapsed to icons the logo is the whole button, so it must keep opening the menu.
+  const logoTap = current !== 'admin' && (isMobile || state === 'expanded')
   const { showUserSystem, showAdminPage } = useFlags()
   const modules: { key: ModuleKey; label: string; icon: LucideIcon; url: string; show: boolean }[] = [
     { key: 'mailbox', label: t('mailbox'), icon: InboxIcon, url: '/', show: true },
     { key: 'user', label: t('userCenter'), icon: UserRoundIcon, url: '/user', show: showUserSystem },
-    { key: 'admin', label: t('admin'), icon: ShieldIcon, url: '/admin', show: showAdminPage || current === 'admin' },
+    { key: 'admin', label: t('admin'), icon: ShieldIcon, url: adminPath(), show: showAdminPage || current === 'admin' },
   ]
   const active = modules.find((m) => m.key === current)
   return (
@@ -49,7 +109,7 @@ export function ModuleSwitcher({ current }: { current: ModuleKey }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
-              <Logo />
+              <Logo adminTap={logoTap} isolate />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{title}</span>
                 <span className="truncate text-xs text-muted-foreground">{active?.label || t('other')}</span>

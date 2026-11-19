@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { keepPreviousData, useQuery, type QueryKey } from '@tanstack/react-query'
+import { useQuery, type QueryKey } from '@tanstack/react-query'
 import type { ListResponse } from '@/lib/api'
+
+/** Stable fallback so `items` keeps its identity while there is no data (effects depend on it). */
+const EMPTY: never[] = []
 
 /**
  * Offset pagination over the worker's list endpoints.
@@ -42,7 +45,10 @@ export function usePagedQuery<Raw, Item = Raw>({
       const items = transform ? await transform(rows) : (rows as unknown as Item[])
       return { items, count: res?.count || 0, page }
     },
-    placeholderData: keepPreviousData,
+    // Keep the previous page on screen while paging, but never show another list's rows
+    // (different filters / mailbox) as a placeholder.
+    placeholderData: (previous, previousQuery) =>
+      previousQuery && JSON.stringify(previousQuery.queryKey.slice(0, -2)) === keyString ? previous : undefined,
     enabled,
   })
 
@@ -58,7 +64,7 @@ export function usePagedQuery<Raw, Item = Raw>({
   }, [])
 
   return {
-    items: (query.data?.items || []) as Item[],
+    items: (query.data?.items ?? EMPTY) as Item[],
     total: Math.max(total, query.data?.items.length || 0),
     page,
     pageSize,

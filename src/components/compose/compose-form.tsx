@@ -11,7 +11,7 @@ import { MailHtml } from '@/components/mail/mail-html'
 import { blockRemoteContent } from '@/lib/remote-content-policy'
 import { errorMessage } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { useCompose, type ContentType } from '@/store/compose'
+import { useCompose, type ComposeStore, type ContentType } from '@/store/compose'
 import { usePrefs } from '@/store/prefs'
 import { defineMessages, useT } from '@/i18n'
 
@@ -81,8 +81,9 @@ const normalizeText = (content: string) => content.replace(/[\u00AD\u200B-\u200D
 const hasContent = (content: string, contentType: ContentType) => {
   if (!content) return false
   if (contentType === 'text') return normalizeText(content).length > 0
-  const container = document.createElement('div')
-  container.innerHTML = content
+  // DOMParser builds an inert document: no image loads or event handlers (unlike innerHTML on a live element),
+  // which matters because the draft may hold untrusted text from a forwarded mail.
+  const container = new DOMParser().parseFromString(content, 'text/html').body
   container.querySelectorAll('script, style, noscript, template').forEach((n) => n.remove())
   if (normalizeText(container.textContent ?? '').length > 0) return true
   return !!container.querySelector('img, audio, video, iframe, svg, canvas, table')
@@ -108,8 +109,10 @@ export function ComposeForm({
   fromSlot,
   onSend,
   onSent,
+  sentHint,
   disabled,
   notice,
+  store = useCompose,
 }: {
   /** Read-only sender address shown in the From row */
   fromAddress?: string
@@ -117,12 +120,16 @@ export function ComposeForm({
   fromSlot?: React.ReactNode
   onSend: (payload: SendMailPayload) => Promise<unknown>
   onSent?: () => void
+  /** Extra line under the "sent" toast */
+  sentHint?: string
   disabled?: boolean
   /** Shown above the form (balance, permission request...) */
   notice?: React.ReactNode
+  /** Draft store, defaults to the shared mailbox draft */
+  store?: ComposeStore
 }) {
   const t = useT(messages)
-  const { draft, revision, setDraft, reset } = useCompose()
+  const { draft, revision, setDraft, reset } = store()
   const autoLoad = usePrefs((s) => s.autoLoadRemoteImages)
   const [preview, setPreview] = useState(false)
   const [sending, setSending] = useState(false)
@@ -151,7 +158,7 @@ export function ComposeForm({
       })
       reset()
       setPreview(false)
-      toast.success(t('sent'))
+      toast.success(t('sent'), { description: sentHint })
       onSent?.()
     } catch (error) {
       toast.error(errorMessage(error))
@@ -222,7 +229,7 @@ export function ComposeForm({
               <MailHtml html={previewHtml} className="min-h-[280px] border" />
             ) : draft.contentType === 'rich' ? (
               <Suspense fallback={<Skeleton className="h-[320px] w-full" />}>
-                <RichEditor value={draft.content} onChange={(content) => setDraft({ content })} resetKey={`${revision}`} />
+                <RichEditor key={revision} value={draft.content} onChange={(content) => setDraft({ content })} />
               </Suspense>
             ) : (
               <Textarea

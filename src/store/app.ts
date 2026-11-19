@@ -54,6 +54,8 @@ export type OpenSettings = {
 /** `/api/settings` — current address. */
 export type AddressSettings = {
   fetched: boolean
+  /** Address JWT these settings were loaded for (differs from the current JWT while switching) */
+  jwt?: string
   address: string
   send_balance: number
 }

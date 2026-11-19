@@ -32,7 +32,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { confirm } from '@/components/common/confirm'
 import { CopyButton } from '@/components/common/copy-button'
 import { blockRemoteContent } from '@/lib/remote-content-policy'
-import { getAiExtract, getEmlDownloadUrl, type MailAttachment, type ParsedMail } from '@/lib/mail-parser'
+import { downloadEml, getAiExtract, type MailAttachment, type ParsedMail } from '@/lib/mail-parser'
 import { formatDateTime } from '@/lib/format'
 import { usePrefs } from '@/store/prefs'
 import { AiExtractCard } from './ai-extract'
@@ -218,7 +218,6 @@ export function MailReader({
   const [fullscreen, setFullscreen] = useState(false)
   const [details, setDetails] = useState(false)
   const extract = getAiExtract(mail.metadata)
-  const emlUrl = useMemo(() => getEmlDownloadUrl(mail.raw), [mail.raw])
 
   const handleDelete = async () => {
     if (!onDelete) return
@@ -276,11 +275,9 @@ export function MailReader({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild>
-              <a href={emlUrl} download={`${mail.id}.eml`}>
-                <DownloadIcon />
-                {t('downloadEml')}
-              </a>
+            <DropdownMenuItem onClick={() => downloadEml(mail.raw, `${mail.id}.eml`)}>
+              <DownloadIcon />
+              {t('downloadEml')}
             </DropdownMenuItem>
             {mail.message && (
               <DropdownMenuItem onClick={() => setShowText((s) => !s)}>

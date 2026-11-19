@@ -25,6 +25,8 @@ import { errorMessage } from '@/lib/format'
 import { leaveAddress, switchAddress } from '@/lib/session'
 import { useApp, useFlags } from '@/store/app'
 import { useAuth } from '@/store/auth'
+import { TelegramAddressPanel } from '@/features/telegram/telegram-address-panel'
+import { isTelegramWebApp } from '@/features/telegram/telegram-web-app'
 import { AddressLoginForm, CreateAddressForm } from './address-forms'
 import { defineMessages, useT } from '@/i18n'
 
@@ -92,27 +94,25 @@ export function AddMailboxDialog({ open, onOpenChange }: { open: boolean; onOpen
           <DialogTitle>{t('addMailbox')}</DialogTitle>
           <DialogDescription>{t('addMailboxDesc')}</DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue={enableCreate ? 'create' : 'login'}>
-          <TabsList className="w-full">
-            {enableCreate && <TabsTrigger value="create">{t('create')}</TabsTrigger>}
-            <TabsTrigger value="login">{t('login')}</TabsTrigger>
-          </TabsList>
-          {enableCreate && (
-            <TabsContent value="create" className="pt-3">
-              <CreateAddressForm
-                onCreated={async (res) => {
-                  await switchAddress(res.jwt)
-                  useAuth.getState().setAddressPassword(res.password || '')
-                  useApp.getState().set({ showCredential: true })
-                  done()
-                }}
-              />
+        {isTelegramWebApp() ? (
+          // Telegram Mini App: addresses are bound to the Telegram account
+          <TelegramAddressPanel onSwitched={done} />
+        ) : (
+          <Tabs defaultValue={enableCreate ? 'create' : 'login'}>
+            <TabsList className="w-full">
+              {enableCreate && <TabsTrigger value="create">{t('create')}</TabsTrigger>}
+              <TabsTrigger value="login">{t('login')}</TabsTrigger>
+            </TabsList>
+            {enableCreate && (
+              <TabsContent value="create" className="pt-3">
+                <CreateAddressForm afterCreated={done} />
+              </TabsContent>
+            )}
+            <TabsContent value="login" className="pt-3">
+              <AddressLoginForm onSuccess={done} />
             </TabsContent>
-          )}
-          <TabsContent value="login" className="pt-3">
-            <AddressLoginForm onSuccess={done} />
-          </TabsContent>
-        </Tabs>
+          </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   )

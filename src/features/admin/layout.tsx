@@ -1,5 +1,5 @@
-import { Suspense, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router'
+import { Suspense, useEffect, useRef } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router'
 import {
   BarChart3Icon,
   BotIcon,
@@ -25,6 +25,7 @@ import {
   MessageCircleIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { adminPath } from './paths'
 import { AppShell, type NavGroup } from '@/components/layout/app-shell'
 import { AdminAuthDialog } from '@/components/common/auth-dialogs'
 import { RouteFallback } from '@/components/common/route-fallback'
@@ -116,61 +117,77 @@ export default function AdminLayout() {
   const nav: NavGroup[] = [
     {
       label: t('overview'),
-      items: [{ title: t('statistics'), url: '/admin', icon: BarChart3Icon }],
+      items: [{ title: t('statistics'), url: adminPath(), icon: BarChart3Icon }],
     },
     {
       label: t('addresses'),
       items: [
-        { title: t('accounts'), url: '/admin/accounts', icon: SquareUserRoundIcon },
-        { title: t('createAccount'), url: '/admin/accounts/new', icon: MailPlusIcon },
-        { title: t('senderAccess'), url: '/admin/sender-access', icon: SendHorizontalIcon },
+        { title: t('accounts'), url: adminPath('accounts'), icon: SquareUserRoundIcon },
+        { title: t('createAccount'), url: adminPath('accounts/new'), icon: MailPlusIcon },
+        { title: t('senderAccess'), url: adminPath('sender-access'), icon: SendHorizontalIcon },
       ],
     },
     {
       label: t('mails'),
       items: [
-        { title: t('allMails'), url: '/admin/mails', icon: InboxIcon },
-        { title: t('unknownMails'), url: '/admin/mails/unknown', icon: MailQuestionIcon },
-        { title: t('sendbox'), url: '/admin/sendbox', icon: MailsIcon },
-        { title: t('sendMail'), url: '/admin/send', icon: SendIcon },
-        { title: t('mailWebhook'), url: '/admin/mail-webhook', icon: WebhookIcon },
+        { title: t('allMails'), url: adminPath('mails'), icon: InboxIcon },
+        { title: t('unknownMails'), url: adminPath('mails/unknown'), icon: MailQuestionIcon },
+        { title: t('sendbox'), url: adminPath('sendbox'), icon: MailsIcon },
+        { title: t('sendMail'), url: adminPath('send'), icon: SendIcon },
+        { title: t('mailWebhook'), url: adminPath('mail-webhook'), icon: WebhookIcon },
       ],
     },
     {
       label: t('users'),
       hidden: !showUserSystem,
       items: [
-        { title: t('userManagement'), url: '/admin/users', icon: UsersIcon },
-        { title: t('userSettings'), url: '/admin/user-settings', icon: UserCogIcon },
-        { title: t('oauth2'), url: '/admin/oauth2', icon: KeyRoundIcon },
-        { title: t('roles'), url: '/admin/roles', icon: ShieldCheckIcon },
+        { title: t('userManagement'), url: adminPath('users'), icon: UsersIcon },
+        { title: t('userSettings'), url: adminPath('user-settings'), icon: UserCogIcon },
+        { title: t('oauth2'), url: adminPath('oauth2'), icon: KeyRoundIcon },
+        { title: t('roles'), url: adminPath('roles'), icon: ShieldCheckIcon },
       ],
     },
     {
       label: t('settings'),
       items: [
-        { title: t('accountSettings'), url: '/admin/account-settings', icon: SettingsIcon },
-        { title: t('webhook'), url: '/admin/webhook', icon: WebhookIcon },
-        { title: t('telegram'), url: '/admin/telegram', icon: MessageCircleIcon },
-        { title: t('aiExtract'), url: '/admin/ai-extract', icon: BotIcon },
-        { title: t('ipBlacklist'), url: '/admin/ip-blacklist', icon: ShieldBanIcon },
-        { title: t('redeemCodes'), url: '/admin/redeem-codes', icon: GiftIcon, hidden: !openSettings.enableRedeemCode },
+        { title: t('accountSettings'), url: adminPath('account-settings'), icon: SettingsIcon },
+        { title: t('webhook'), url: adminPath('webhook'), icon: WebhookIcon },
+        { title: t('telegram'), url: adminPath('telegram'), icon: MessageCircleIcon },
+        { title: t('aiExtract'), url: adminPath('ai-extract'), icon: BotIcon },
+        { title: t('ipBlacklist'), url: adminPath('ip-blacklist'), icon: ShieldBanIcon },
+        { title: t('redeemCodes'), url: adminPath('redeem-codes'), icon: GiftIcon, hidden: !openSettings.enableRedeemCode },
       ],
     },
     {
       label: t('system'),
       items: [
-        { title: t('database'), url: '/admin/database', icon: DatabaseIcon },
-        { title: t('workerConfig'), url: '/admin/worker', icon: FileCogIcon },
-        { title: t('maintenance'), url: '/admin/maintenance', icon: WrenchIcon },
+        { title: t('database'), url: adminPath('database'), icon: DatabaseIcon },
+        { title: t('workerConfig'), url: adminPath('worker'), icon: FileCogIcon },
+        { title: t('maintenance'), url: adminPath('maintenance'), icon: WrenchIcon },
       ],
     },
   ]
 
+  // Log out only once we have actually left the console: a settings page with unsaved changes may block the
+  // navigation (and clearing the password first would unmount it before its confirm dialog could show).
+  const { pathname } = useLocation()
+  const logoutOnLeave = useRef(false)
+  const loggedOutText = useRef(t('loggedOut'))
+  loggedOutText.current = t('loggedOut')
+  useEffect(() => {
+    logoutOnLeave.current = false
+  }, [pathname])
+  useEffect(
+    () => () => {
+      if (!logoutOnLeave.current) return
+      useAuth.getState().setAdminAuth('')
+      toast.success(loggedOutText.current)
+    },
+    [],
+  )
   const logout = adminAuth
     ? () => {
-        useAuth.getState().setAdminAuth('')
-        toast.success(t('loggedOut'))
+        logoutOnLeave.current = true
         navigate('/')
       }
     : undefined

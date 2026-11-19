@@ -43,58 +43,58 @@
 
 | # | 任务 | 对应旧页面 | 状态 |
 |---|------|-----------|------|
-| 2.1 | 登录 / 创建地址（凭证登录、地址密码登录、域名/子域名/过期时间、随机名）+ 落地页 | `common/Login.vue` | ✅（待联调） |
-| 2.2 | 地址切换器（本地缓存地址 + 用户绑定地址）、本地地址管理 | `AddressSelect.vue`, `LocalAddress.vue` | ✅（待联调） |
-| 2.3 | 收件箱三栏（搜索、自动刷新、已读/未读、多选删除/下载、`?mail_id=`） | `MailBox.vue` | ⏳ |
-| 2.4 | 发件箱 | `SendBox.vue` | ⏳ |
-| 2.5 | 写信 / 回复 / 转发、申请发信权限 | `index/SendMail.vue` | ⏳ |
-| 2.6 | 地址设置（凭证、修改密码、清空收件箱/发件箱、删除地址） | `index/AccountSettings.vue` | ⏳ |
-| 2.7 | 自动回复 | `index/AutoReply.vue` | ⏳ |
-| 2.8 | S3 附件管理 | `index/Attachment.vue` | ⏳ |
-| 2.9 | 外观偏好设置、关于页 | `common/Appearance.vue`, `About.vue` | ⏳ |
+| 2.1 | 登录 / 创建地址（凭证登录、地址密码登录、域名/子域名/过期时间、随机名）+ 落地页 | `common/Login.vue` | ✅ |
+| 2.2 | 地址切换器（本地缓存地址 + 用户绑定地址）、本地地址管理 | `AddressSelect.vue`, `LocalAddress.vue` | ✅ |
+| 2.3 | 收件箱三栏（搜索、自动刷新、已读/未读、多选删除/下载、`?mail_id=`） | `MailBox.vue` | ✅ |
+| 2.4 | 发件箱 | `SendBox.vue` | ✅ |
+| 2.5 | 写信 / 回复 / 转发、申请发信权限 | `index/SendMail.vue` | ✅ |
+| 2.6 | 地址设置（凭证、修改密码、清空收件箱/发件箱、删除地址） | `index/AccountSettings.vue` | ✅ |
+| 2.7 | 自动回复 | `index/AutoReply.vue` | ✅ |
+| 2.8 | S3 附件管理 | `index/Attachment.vue` | ✅ |
+| 2.9 | 外观偏好设置、关于页 | `common/Appearance.vue`, `About.vue` | ✅ |
 
 ## 阶段 3：用户中心（子代理 A）
 
 | # | 任务 | 对应旧页面 | 状态 |
 |---|------|-----------|------|
-| 3.1 | 登录 / 注册 / 邮箱验证码 / 找回密码 | `user/UserLogin.vue` | ⏳ |
-| 3.2 | Passkey 登录与管理、OAuth2 登录与回调 | `UserLogin.vue`, `UserOauth2Callback.vue`, `UserSettings.vue` | ⏳ |
-| 3.3 | 地址管理（绑定、解绑、转移、新建、切换） | `user/AddressManagement.vue`, `BindAddress.vue` | ⏳ |
-| 3.4 | 用户收件箱 / 发件箱 / 写信 | `UserMailBox.vue`, `UserSendBox.vue`, `user/SendMail.vue` | ⏳ |
-| 3.5 | 用户设置（账户信息、退出、Passkey 列表） | `user/UserSettings.vue` | ⏳ |
+| 3.1 | 登录 / 注册 / 邮箱验证码 / 找回密码 | `user/UserLogin.vue` | ✅ |
+| 3.2 | Passkey 登录与管理、OAuth2 登录与回调 | `UserLogin.vue`, `UserOauth2Callback.vue`, `UserSettings.vue` | ✅ |
+| 3.3 | 地址管理（绑定、解绑、转移、新建、切换） | `user/AddressManagement.vue`, `BindAddress.vue` | ✅ |
+| 3.4 | 用户收件箱 / 发件箱 / 写信 | `UserMailBox.vue`, `UserSendBox.vue`, `user/SendMail.vue` | ✅ |
+| 3.5 | 用户设置（账户信息、退出、Passkey 列表） | `user/UserSettings.vue` | ✅ |
 
 ## 阶段 4：管理后台 · 账号与邮件（子代理 B）
 
 | # | 任务 | 对应旧页面 | 状态 |
 |---|------|-----------|------|
-| 4.1 | 地址账号列表（搜索、查看凭证、重置密码、清空、删除、批量操作） | `admin/Account.vue` | ⏳ |
-| 4.2 | 创建地址、批量创建、批量导出 | `CreateAccount.vue`, `BatchCreate.vue`, `BatchExportModal.vue` | ⏳ |
-| 4.3 | 全部邮件 / 未知收件人邮件 / 发件箱 | `Mails.vue`, `MailsUnknow.vue`, `admin/SendBox.vue` | ⏳ |
-| 4.4 | 管理员发信 | `admin/SendMail.vue` | ⏳ |
-| 4.5 | 发信权限管理 | `SenderAccess.vue` | ⏳ |
-| 4.6 | 统计概览 + 趋势图 | `Statistics.vue`, `StatisticsTrend.vue` | ⏳ |
-| 4.7 | 用户管理、用户地址管理 | `UserManagement.vue`, `UserAddressManagement.vue` | ⏳ |
+| 4.1 | 地址账号列表（搜索、查看凭证、重置密码、清空、删除、批量操作） | `admin/Account.vue` | ✅ |
+| 4.2 | 创建地址、批量创建、批量导出 | `CreateAccount.vue`, `BatchCreate.vue`, `BatchExportModal.vue` | ✅ |
+| 4.3 | 全部邮件 / 未知收件人邮件 / 发件箱 | `Mails.vue`, `MailsUnknow.vue`, `admin/SendBox.vue` | ✅ |
+| 4.4 | 管理员发信 | `admin/SendMail.vue` | ✅ |
+| 4.5 | 发信权限管理 | `SenderAccess.vue` | ✅ |
+| 4.6 | 统计概览 + 趋势图 | `Statistics.vue`, `StatisticsTrend.vue` | ✅ |
+| 4.7 | 用户管理、用户地址管理 | `UserManagement.vue`, `UserAddressManagement.vue` | ✅ |
 
 ## 阶段 5：管理后台 · 设置类 + 其它（子代理 C1：5.1/5.2/5.4 中 AI 提取与 IP 黑名单/5.5；子代理 C2：5.3/5.4 中 Telegram/5.6/5.7）
 
 | # | 任务 | 对应旧页面 | 状态 |
 |---|------|-----------|------|
-| 5.1 | 账号设置（黑名单、关键字等） | `admin/AccountSettings.vue` | ⏳ |
-| 5.2 | 用户设置、OAuth2 设置、角色地址配置 | `UserSettings.vue`, `UserOauth2Settings.vue`, `RoleAddressConfig.vue` | ⏳ |
-| 5.3 | Webhook 共享组件 + 地址 Webhook + 全局 Webhook + 邮件 Webhook | `WebhookComponent.vue`, `index/Webhook.vue`, `admin/Webhook.vue`, `MailWebhook.vue` | ⏳ |
-| 5.4 | Telegram 设置、AI 提取设置、IP 黑名单 | `Telegram.vue`, `AiExtractSettings.vue`, `IpBlacklistSettings.vue` | ⏳ |
-| 5.5 | Worker 配置、维护（清理）、数据库管理 | `WorkerConfig.vue`, `Maintenance.vue`, `DatabaseManager.vue` | ⏳ |
-| 5.6 | 兑换码管理 + 兑换页 | `RedeemCodes.vue`, `Redeem.vue` | ⏳ |
-| 5.7 | Telegram 小程序（地址管理、邮件查看） | `TelegramAddress.vue`, `telegram/Mail.vue` | ⏳ |
+| 5.1 | 账号设置（黑名单、关键字等） | `admin/AccountSettings.vue` | ✅ |
+| 5.2 | 用户设置、OAuth2 设置、角色地址配置 | `UserSettings.vue`, `UserOauth2Settings.vue`, `RoleAddressConfig.vue` | ✅ |
+| 5.3 | Webhook 共享组件 + 地址 Webhook + 全局 Webhook + 邮件 Webhook | `WebhookComponent.vue`, `index/Webhook.vue`, `admin/Webhook.vue`, `MailWebhook.vue` | ✅ |
+| 5.4 | Telegram 设置、AI 提取设置、IP 黑名单 | `Telegram.vue`, `AiExtractSettings.vue`, `IpBlacklistSettings.vue` | ✅ |
+| 5.5 | Worker 配置、维护（清理）、数据库管理 | `WorkerConfig.vue`, `Maintenance.vue`, `DatabaseManager.vue` | ✅ |
+| 5.6 | 兑换码管理 + 兑换页 | `RedeemCodes.vue`, `Redeem.vue` | ✅ |
+| 5.7 | Telegram 小程序（地址管理、邮件查看） | `TelegramAddress.vue`, `telegram/Mail.vue` | ✅ |
 
 ## 阶段 6：集成与验收（主线程负责）
 
 | # | 任务 | 状态 |
 |---|------|------|
-| 6.1 | 合并各模块、统一导航与路由、类型检查 + 构建 | ⏳ |
-| 6.2 | 本地起 Worker 联调，浏览器逐页冒烟测试（亮/暗色、桌面/移动端） | ⏳ |
-| 6.3 | 代码审查（正确性、与旧接口契约一致性） | ⏳ |
-| 6.4 | README：开发、构建、部署（Cloudflare Pages / 与 Worker 同域）说明 | ⏳ |
+| 6.1 | 合并各模块、统一导航与路由、类型检查 + 构建 | ✅ |
+| 6.2 | 本地起 Worker 联调，浏览器逐页冒烟测试（亮/暗色、桌面/移动端） | ✅ |
+| 6.3 | 代码审查（正确性、与旧接口契约一致性） | ✅ |
+| 6.4 | README：开发、构建、部署（Cloudflare Pages / 与 Worker 同域）说明 | ✅ |
 
 ---
 
@@ -102,14 +102,29 @@
 
 - 2026-11-19：确定技术栈与范围；完成阶段 0、阶段 1（基础层全部）、阶段 2.1–2.2。按用户要求暂停，推送到 GitHub。
 
+- 2026-11-20：继续开发。新增 `docs/CONVENTIONS.md`（共享开发约定）、Telegram Mini App 脚本加载；派出 4 个子代理并行开发阶段 3–5；主线程开始阶段 2.3–2.9。
+- 2026-11-20：阶段 2.3–2.9 完成，并与本地 Worker（e2e Docker）联调通过：建地址、凭证弹窗、三栏收件箱、远程图片拦截、写信（纯文本/HTML/富文本）、设置、偏好、自动回复、暗色、移动端单栏。修复：富文本编辑器在 StrictMode 下崩溃（改为 `key` 重挂载）；用自写 `lib/theme.ts` 替换 next-themes（React 19 下报 script 警告，`index.html` 内联脚本防闪烁）；写信页顶栏标题缺失；顶栏分隔线未居中；新增路由级错误页 `RouteError`。主包拆分后 200KB（gzip 69KB）。
+
+- 2026-11-20：发现路由冲突——Pages 中间件 / Worker 会把 `/admin/*` 全部转发给后端 API，后台深链刷新会打到接口。后台前端路由改为 `/console/*`（`/admin` 重定向过去，`adminPath()` 构造链接），dev 代理改为与中间件一致的带斜杠前缀正则；已通知各子代理。新增 `pages/`（Pages 项目 + API 转发中间件），README 补全构建、配置、三种部署方式与兼容说明（6.4 ✅）。
+
+- 2026-11-20：阶段 4 完成（子代理 B，已在本地 Worker 实测）：统计概览 + 趋势图、地址列表（服务端排序、批量操作带进度）、单个/批量创建 + CSV 导出、发信权限、全部/未知收件人邮件、发件箱、管理员发信、用户管理（含新增的给用户绑定地址）。主线程跟进：管理员发信改用独立草稿 `useAdminCompose`（`ComposeForm store`），发信成功提示合并为一条（`ComposeForm sentHint`）。
+
+- 2026-11-20：阶段 3 完成（子代理 A，已在本地 Worker 实测桌面 + 390px）：登录/注册/验证码/找回密码、Passkey、OAuth2 登录与回调（沿用旧 state 键名）、地址管理（服务端搜索、转移、解绑、新建、绑定）、用户收件箱/发件箱（新增回复/转发）、写信、用户设置（Passkey 列表）。主线程跟进共享代码：侧栏「新建邮箱」漏绑定用户的 bug（`CreateAddressForm` 新增 `afterCreated` / `showCredential`，默认流程统一为切换→绑定→凭证弹窗）；`AddressLoginForm onSuccess({ bound })`；凭证弹窗取消自动聚焦（首次 Esc 被 tooltip 吃掉）。
+
+- 2026-11-20：阶段 5 完成。子代理 C1（设置类，9 页）：邮箱设置、用户设置、OAuth2（4 种模板）、角色地址配置、AI 提取、IP 黑名单、数据库、Worker 配置、维护；共享 `use-settings-draft`（未保存改动离开确认）、`StringListInput`、吸底保存栏。子代理 C2：Webhook 过滤规则编辑器（可视化 + JSON，旧 34 条单测通过）、地址/全局/邮件 Webhook、Telegram 设置、兑换码管理 + 兑换页、Telegram 小程序面板与邮件页。主线程跟进：`confirm({ destructive })` 按钮未变红；Telegram 内侧栏「新建或登录邮箱」改用 `TelegramAddressPanel`；后台长导航自动滚动到当前项；`vite.config` 改用 `import.meta.dirname`。
+- 2026-11-20：阶段 6.1/6.2 完成：tsc 0 错误、构建无警告、lint 0 错误（24 条警告）。全量页面冒烟（后台 22 页 + 用户中心 5 页 + 兑换页，浅色桌面 / 暗色桌面 / 浅色手机）0 控制台错误、0 接口失败、0 崩溃。已知后端旧问题（未改）：`/admin/account_settings` 仅在 `fromBlockList` 非空时写 KV，清空后保存不生效。
+
+- 2026-11-20：补回旧版隐藏入口：连点站点 logo 5 次进入管理后台（`Logo` 组件内置，提示剩余次数，3 秒未点则重新计数；侧栏里点 logo 不再展开模块菜单，折叠为图标时除外；后台内不触发），落地页与侧栏均已在浏览器实测。站点/管理员密码框的 Turnstile 改为仅在 `enableGlobalTurnstileCheck` 时显示（与旧版一致）。
+
+- 2026-11-20：6.3 代码审查完成（3 个审查代理对照 Worker 源码，接口契约全部一致），修复 14 处：
+  - 邮箱/共享层：分页 hook 无数据时 `items` 每次新建导致无限渲染；`hasContent` 用 `innerHTML` 解析转发正文可触发 XSS（改 `DOMParser`）；切换邮箱期间仍显示上一个邮箱的邮件（`addressSettings.jwt` 不一致时卸载页面，分页占位数据不跨列表）；`loadAddressSettings` 迟到响应覆盖当前地址；登录表单未走 `switchAddress`；access token 刷新重试前校验会话未变；附件 blob URL 复用并按 LRU 释放、.eml 按需生成。
+  - 用户侧：兑换码列表加载失败无提示；兑换码导出 CSV 补 BOM；关闭发信时 `/sent`、`/compose`（邮箱与用户中心）重定向。
+  - 后台：发信权限、修改角色弹窗取消后重开仍是旧草稿；有未保存改动时退出管理员不生效；邮箱设置保存后刷新期间可重复提交；接收屏蔽关键词清空无效（后端限制）加提示。
+  - 定向浏览器测试：XSS 不执行、切换邮箱不再闪现旧邮件、列表接口 500 时无渲染循环。
+- 2026-11-20：按用户要求：侧栏菜单分组可折叠（点分组标题，按模块记住状态，当前页所在分组自动展开，图标模式下忽略）；侧栏宽/窄模式（底部「收起菜单」按钮 + ⌘B/Ctrl+B，状态持久化；桌面端顶栏开关移除，仅手机端保留）。
+
 ## 下次继续（交接说明）
 
-1. **阶段 2.3–2.9**（主线程）：邮箱各页面目前是占位页 `src/features/mailbox/pages/*.tsx`，用已完成的 `MailWorkspace` / `SendboxWorkspace` / `ComposeForm` 组装即可。
-2. **并行派 4 个子代理**：A 用户中心（`src/features/user/**`）、B 后台账号与邮件、C1 后台设置类、C2 Webhook/Telegram/兑换码（`src/features/{webhook,telegram,redeem}/**`）。各自只改自己目录下的占位页，不改共享组件、不装新依赖、不改 PLAN.md。
-3. 关键约定（写给子代理的 brief 要包含）：
-   - 文案：`defineMessages({ zh, en })` + `useT(messages)`，旧文案可从 `cloudflare_temp_email/frontend/src/i18n/message-registry.ts` 取。
-   - 请求：`api.get/post/put/patch/delete`（`src/lib/api.ts`），列表分页用 `usePagedQuery`（后端只在 offset=0 时返回 count，limit ≤ 100）。
-   - 页面骨架：`Page` / `PageHeader` / `Section`；确认框 `confirm()`；`CopyButton`、`DataPagination`、`EmptyState`、`Turnstile`、`PasswordInput`、`AddressCredentialDialog`。
-   - 邮件：`MailWorkspace`、`SendboxWorkspace`、`ComposeForm`；地址：`CreateAddressForm`、`AddressLoginForm`、`switchAddress()`。
-4. 待优化：主包 710KB（邮件解析被 layout 间接引入），阶段 6 拆包；lint 有若干 `set-state-in-effect` 警告。
-
+1. 阶段 0–6 全部完成。可选后续：清理 lint 警告（27 条，均为 warning）；迁移旧版偏好设置键（`useUTCDate` 等，旧版 `autoLoadRemoteImages` 默认开启、新版默认关闭）；用设置了站点密码 / 管理员密码的 Worker 实测密码弹框流程。
+2. 本地联调环境：`cloudflare_temp_email/e2e` 下 `docker compose -p tmweb up -d --build worker mailpit`，再 `POST /admin/db_initialize`、`/admin/db_migration`；前端 `DEV_PROXY_TARGET=http://localhost:8787 pnpm dev`。冒烟脚本在仓库外（`/tmp/tm-smoke`），后台免密（e2e 配置 `DISABLE_ADMIN_PASSWORD_CHECK=true`）。
+3. 规则：前端路由不能以后端前缀开头（后台在 `/console/*`，见 `docs/CONVENTIONS.md`）。

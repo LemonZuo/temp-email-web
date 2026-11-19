@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useT } from '@/i18n'
-import { buttonVariants } from '@/components/ui/button'
 
 type ConfirmOptions = {
   title?: string
@@ -55,10 +54,7 @@ export function ConfirmHost() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => close(false)}>{options.cancelText || t('cancel')}</AlertDialogCancel>
-          <AlertDialogAction
-            className={options.destructive ? buttonVariants({ variant: 'destructive' }) : undefined}
-            onClick={() => close(true)}
-          >
+          <AlertDialogAction variant={options.destructive ? 'destructive' : 'default'} onClick={() => close(true)}>
             {options.confirmText || t('confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>

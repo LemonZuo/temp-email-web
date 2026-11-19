@@ -1,6 +1,7 @@
 import { PaperclipIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAiExtract, type ParsedMail } from '@/lib/mail-parser'
+import { getAiExtract } from '@/lib/ai-extract'
+import type { ParsedMail } from '@/lib/mail-parser'
 import { formatShortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { usePrefs } from '@/store/prefs'

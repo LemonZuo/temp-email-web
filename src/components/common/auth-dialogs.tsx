@@ -53,6 +53,8 @@ function PasswordDialog({
   const [cfToken, setCfToken] = useState('')
   const [loading, setLoading] = useState(false)
   const turnstile = useRef<TurnstileHandle>(null)
+  // Same as the old frontend: /open_api/site_login and admin_login only check Turnstile when the global check is on.
+  const turnstileEnabled = useApp((s) => s.openSettings.enableGlobalTurnstileCheck)
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!password) return
@@ -86,7 +88,7 @@ function PasswordDialog({
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Field>
-            <Turnstile ref={turnstile} onToken={setCfToken} />
+            {turnstileEnabled && <Turnstile ref={turnstile} onToken={setCfToken} />}
           </FieldGroup>
           <DialogFooter>
             <Button type="submit" disabled={!password || loading} className="w-full sm:w-auto">

@@ -10,7 +10,8 @@ import { LanguageToggle, ThemeToggle } from '@/components/layout/header-controls
 import { sanitizeHtml } from '@/lib/sanitize'
 import { useApp, useFlags } from '@/store/app'
 import { useAuth } from '@/store/auth'
-import { isTelegramWebApp, TelegramAddressPanel } from '@/features/telegram/telegram-address-panel'
+import { TelegramAddressPanel } from '@/features/telegram/telegram-address-panel'
+import { isTelegramWebApp } from '@/features/telegram/telegram-web-app'
 import { AddressLoginForm, CreateAddressForm } from './components/address-forms'
 import { defineMessages, useT } from '@/i18n'
 

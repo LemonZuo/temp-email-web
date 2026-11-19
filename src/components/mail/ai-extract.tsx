@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { copyText } from '@/lib/clipboard'
-import type { AiExtract } from '@/lib/mail-parser'
+import type { AiExtract } from '@/lib/ai-extract'
 import { defineMessages, useT } from '@/i18n'
 
 const messages = defineMessages({

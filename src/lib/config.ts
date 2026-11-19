@@ -24,8 +24,17 @@ const str = (key: string, buildValue: string | undefined): string => {
   return typeof runtimeValue === 'string' ? runtimeValue : buildValue || ''
 }
 
+const bool = (key: string, buildValue: string | undefined): boolean => {
+  const runtimeValue = runtimeConfig[key]
+  if (typeof runtimeValue === 'boolean') return runtimeValue
+  if (typeof runtimeValue === 'string') return runtimeValue === 'true'
+  return buildValue === 'true'
+}
+
 export const APP_CONFIG = {
   API_BASE: str('API_BASE', import.meta.env.VITE_API_BASE).replace(/\/$/, ''),
   DEFAULT_LANG: str('DEFAULT_LANG', import.meta.env.VITE_DEFAULT_LANG),
   VERSION: (import.meta.env.PACKAGE_VERSION as string | undefined) || '',
+  /** Telegram Mini App build: loads telegram-web-app.js before rendering */
+  IS_TELEGRAM: bool('IS_TELEGRAM', import.meta.env.VITE_IS_TELEGRAM),
 } as const

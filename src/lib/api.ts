@@ -149,7 +149,12 @@ export async function apiFetch<T = unknown>(path: string, options: ApiOptions = 
           if (!MAILBOX_REFRESH_PATHS.has(pathname)) throw error
         }
       }
-      ;({ status, data } = await rawRequest(path, options, await buildHeaders(options, accessToken)))
+      const retryHeaders = await buildHeaders(options, accessToken)
+      // Never replay a request (e.g. send_mail) as a different mailbox or user than the one it was made for.
+      if (retryHeaders['Authorization'] !== headers['Authorization'] || retryHeaders['x-user-token'] !== headers['x-user-token']) {
+        throw new ApiError(status, 'Session changed, please try again', data)
+      }
+      ;({ status, data } = await rawRequest(path, options, retryHeaders))
     }
   }
 
@@ -215,10 +220,15 @@ export async function loadAddressSettings() {
   }
   try {
     const res = await api.get<{ address: string; send_balance: number; new_address_token?: string }>('/api/settings')
-    if (res.new_address_token && useAuth.getState().jwt === jwt) setJwt(res.new_address_token)
-    set({ addressSettings: { fetched: true, address: res.address, send_balance: res.send_balance || 0 } })
+    // Switched to another mailbox meanwhile: that newer call owns the settings.
+    if (useAuth.getState().jwt !== jwt) return
+    if (res.new_address_token) setJwt(res.new_address_token)
+    set({
+      addressSettings: { fetched: true, jwt: res.new_address_token || jwt, address: res.address, send_balance: res.send_balance || 0 },
+    })
   } catch (error) {
-    set({ addressSettings: { fetched: true, address: '', send_balance: 0 } })
+    if (useAuth.getState().jwt !== jwt) return
+    set({ addressSettings: { fetched: true, jwt, address: '', send_balance: 0 } })
     throw error
   }
 }
@@ -259,7 +269,9 @@ export async function loadUserSettings() {
 }
 
 /** After an address login/creation, bind it to the logged-in user account (if any). */
-export async function bindAddressToUser() {
-  if (!useAuth.getState().userJwt) return
+/** Bind the current mailbox to the logged-in user. Returns false when no user is logged in. */
+export async function bindAddressToUser(): Promise<boolean> {
+  if (!useAuth.getState().userJwt) return false
   await api.post('/user_api/bind_address')
+  return true
 }

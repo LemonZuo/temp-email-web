@@ -252,7 +252,8 @@ export function AddressCredentialDialog({
   const t = useT(messages)
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+      {/* no autofocus: it would pop the first copy button's tooltip and eat the first Esc */}
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription className="font-mono">{address}</DialogDescription>

@@ -78,7 +78,7 @@ function ComposeButton() {
 export default function MailboxLayout() {
   const t = useT(messages)
   const jwt = useAuth((s) => s.jwt)
-  const { fetched, address } = useApp((s) => s.addressSettings)
+  const { fetched, address, jwt: settingsJwt } = useApp((s) => s.addressSettings)
   const openSettings = useApp((s) => s.openSettings)
 
   useEffect(() => {
@@ -94,6 +94,8 @@ export default function MailboxLayout() {
       items: [
         { title: t('inbox'), url: '/', icon: InboxIcon },
         { title: t('sent'), url: '/sent', icon: SendIcon, hidden: !openSettings.enableSendMail },
+        // Not shown in the menu (the compose button is above); only used for the header title.
+        { title: t('compose'), url: '/compose', icon: PenSquareIcon, hidden: true },
       ],
     },
     {
@@ -125,9 +127,14 @@ export default function MailboxLayout() {
         </>
       }
     >
-      <Suspense fallback={<RouteFallback />}>
-        <Outlet />
-      </Suspense>
+      {/* While switching mailboxes, unmount the pages so the previous mailbox's mails are never shown */}
+      {settingsJwt !== jwt ? (
+        <RouteFallback />
+      ) : (
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
+      )}
       <CurrentAddressCredentialDialog />
     </AppShell>
   )

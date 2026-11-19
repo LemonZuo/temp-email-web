@@ -1,13 +1,14 @@
 {
   "name": "temp-email-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:telegram": "VITE_IS_TELEGRAM=true tsc -b && VITE_IS_TELEGRAM=true vite build"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^5.3.0",
@@ -27,7 +28,6 @@
     "dompurify": "^3.4.18",
     "jszip": "^3.10.2",
     "lucide-react": "^1.75.0",
-    "next-themes": "^0.4.6",
     "postal-mime": "^4.2.1",
     "qrcode.react": "^4.2.0",
     "radix-ui": "^1.8.1",

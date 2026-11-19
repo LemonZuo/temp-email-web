@@ -1,0 +1,11 @@
+# Cloudflare Pages project serving ../dist and proxying API paths to the Worker (same origin).
+# Deploy: pnpm build && cd pages && npx wrangler pages deploy --branch production
+name = "temp-email-web"
+pages_build_output_dir = "../dist"
+compatibility_date = "2024-05-13"
+
+[[services]]
+binding = "BACKEND"
+# name of your deployed cloudflare_temp_email worker
+service = "cloudflare_temp_email"
+environment = "production"
