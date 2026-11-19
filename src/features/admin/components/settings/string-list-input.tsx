@@ -114,7 +114,7 @@ export function StringListInput({
           aria-invalid={aria['aria-invalid'] || undefined}
           className={cn(
             'flex min-h-8 w-full min-w-0 cursor-text flex-wrap items-center gap-1 rounded-lg border border-input bg-transparent px-1.5 py-1 text-sm transition-colors',
-            'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30',
+            'dark:bg-input/30',
             'aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20',
             'data-disabled:cursor-not-allowed data-disabled:bg-input/50 data-disabled:opacity-50',
             className,

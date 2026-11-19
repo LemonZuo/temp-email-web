@@ -126,6 +126,7 @@
 - 2026-11-20：写信正文输入框（纯文本 / HTML / 富文本）去掉聚焦光圈。
 - 2026-11-20：支持 Cloudflare 控制台「Continue with GitHub」部署（Workers 静态资源）：新增 `wrangler.jsonc`（`dist` + SPA 回退）、`.node-version`、`packageManager`、`deploy` 脚本；干净目录模拟 CI 安装/构建、`wrangler deploy --dry-run`、`wrangler dev` 深链刷新均通过。README 补部署方式 C。
 - 2026-11-20：线上 Worker 为 v1.13.0（趋势统计接口 v1.14.0 才有），统计页兼容旧版返回（只显示总数并提示升级）；对比 v1.13.0 与 main 的路由完全一致，其余新字段在旧版缺失时均按关闭处理，仅转发规则的收件人正则 / 删除原邮件选项在旧版不生效。邮件列表栏改为像素宽度（默认 360px、最小 280px，窗口变宽只加宽阅读区，拖动宽度持久化；`tm-prefs` 升到 v1 并丢弃旧的百分比值）。
+- 2026-11-20：全站输入框去掉聚焦光圈和边框变色（`Input`、`Textarea`、`InputGroup`、后台标签输入框；按钮、开关、下拉等仍保留键盘聚焦提示）；OAuth2 类型卡片的图标、名称、单选框垂直居中。
 
 ## 下次继续（交接说明）
 

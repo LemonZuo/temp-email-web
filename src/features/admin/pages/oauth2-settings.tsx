@@ -617,7 +617,8 @@ function AddProviderDialog({
               <RadioGroup value={type} onValueChange={(v) => setType(v as TemplateKey)} className="grid grid-cols-2 gap-2">
                 {TEMPLATE_OPTIONS.map((option) => (
                   <FieldLabel key={option.value} htmlFor={`${id}-${option.value}`}>
-                    <Field orientation="horizontal">
+                    {/* Title-only cards: center icon, name and radio (the default top-aligns rows with content) */}
+                    <Field orientation="horizontal" className="has-[>[data-slot=field-content]]:items-center">
                       {option.value === 'custom' ? (
                         <SvgIcon />
                       ) : (

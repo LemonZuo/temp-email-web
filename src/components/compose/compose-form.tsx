@@ -234,7 +234,7 @@ export function ComposeForm({
             ) : (
               <Textarea
                 className={cn(
-                  'min-h-[320px] resize-y focus-visible:border-input focus-visible:ring-0',
+                  'min-h-[320px] resize-y',
                   draft.contentType === 'html' && 'font-mono text-xs',
                 )}
                 value={draft.content}

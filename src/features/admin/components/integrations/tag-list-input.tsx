@@ -62,7 +62,7 @@ export function TagListInput({
     <div className={cn('grid gap-1.5', className)}>
       <div
         className={cn(
-          'flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border border-input bg-transparent px-1.5 py-1 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30',
+          'flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-lg border border-input bg-transparent px-1.5 py-1 transition-colors dark:bg-input/30',
           disabled && 'pointer-events-none opacity-50',
         )}
         onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement | null)?.focus()}
