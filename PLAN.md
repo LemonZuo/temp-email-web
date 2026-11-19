@@ -5,6 +5,7 @@
 - **技术栈**：Vite 8 + React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui（radix-nova 风格）
 - **路由/状态/数据**：react-router 8 · zustand · @tanstack/react-query
 - **其它**：sonner（提示）· lucide-react（图标）· postal-mime（邮件解析）· DOMPurify · Tiptap（富文本写信）· recharts（统计图）
+- **上游基线**：`cloudflare_temp_email` 提交 `a40a6b0`（`refactor: extract shared mail parser (#1251)`，v1.15.0，DB schema v0.0.11），之后的上游同步记录见 [docs/UPSTREAM.md](./docs/UPSTREAM.md)
 - **视觉风格**：类 Gmail / Outlook 三栏布局（侧边导航 + 邮件列表 + 阅读区），移动端自动折叠
 - **范围**：邮箱主页 + 用户中心 + 管理后台 + 兑换码 + Telegram 小程序，全部覆盖
 - **兼容性**：沿用旧前端的 localStorage key（`jwt` / `userJwt` / `adminAuth` / `auth` / `LocalAddressCache`），替换部署后用户无需重新登录；保留 `/user/oauth2/callback`、`?jwt=`、`?mail_id=` 等入口
@@ -127,6 +128,7 @@
 - 2026-11-20：支持 Cloudflare 控制台「Continue with GitHub」部署（Workers 静态资源）：新增 `wrangler.jsonc`（`dist` + SPA 回退）、`.node-version`、`packageManager`、`deploy` 脚本；干净目录模拟 CI 安装/构建、`wrangler deploy --dry-run`、`wrangler dev` 深链刷新均通过。README 补部署方式 C。
 - 2026-11-20：线上 Worker 为 v1.13.0（趋势统计接口 v1.14.0 才有），统计页兼容旧版返回（只显示总数并提示升级）；对比 v1.13.0 与 main 的路由完全一致，其余新字段在旧版缺失时均按关闭处理，仅转发规则的收件人正则 / 删除原邮件选项在旧版不生效。邮件列表栏改为像素宽度（默认 360px、最小 280px，窗口变宽只加宽阅读区，拖动宽度持久化；`tm-prefs` 升到 v1 并丢弃旧的百分比值）。
 - 2026-11-20：全站输入框去掉聚焦光圈和边框变色（`Input`、`Textarea`、`InputGroup`、后台标签输入框；按钮、开关、下拉等仍保留键盘聚焦提示）；OAuth2 类型卡片的图标、名称、单选框垂直居中。
+- 2026-11-20：新增 `docs/UPSTREAM.md`，记录改造基线（上游 `a40a6b0`）与同步方法；线上后端已升级到 v1.15.0。同步上游 `665614b`、`50619c4`：创建邮箱的过期预设改为提交绝对时间 `expiresAt`（新版后端不再接受 `expiresIn`，基线版本也兼容），本地 Worker 实测到期时间正确。
 
 ## 下次继续（交接说明）
 

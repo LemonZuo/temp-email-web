@@ -9,6 +9,10 @@ Telegram Mini App.
 See [PLAN.md](./PLAN.md) for the task plan and status, and [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) for how pages
 are built.
 
+**Upstream baseline:** rewritten from upstream commit
+[`a40a6b0`](https://github.com/dreamhunter2333/cloudflare_temp_email/commit/a40a6b0dd8edaacd69c8d8ac71e0d3796650fff9)
+(v1.15.0). Synced upstream commits and how to sync are tracked in [docs/UPSTREAM.md](./docs/UPSTREAM.md).
+
 ## Development
 
 ```bash

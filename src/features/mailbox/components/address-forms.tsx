@@ -236,7 +236,6 @@ export type NewAddressBody = {
   cf_token: string
   enableRandomSubdomain: boolean
   expiresAt?: string | null
-  expiresIn?: number | null
 }
 
 /**
