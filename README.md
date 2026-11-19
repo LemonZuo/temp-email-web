@@ -81,7 +81,22 @@ run_worker_first = true
 
 The worker returns `index.html` for every non-API path without a file extension.
 
-### C. Separate origin
+### C. Cloudflare Workers via GitHub (Workers Builds)
+
+`wrangler.jsonc` deploys `dist/` as a Worker with static assets and an SPA fallback. In the Cloudflare dashboard:
+**Workers & Pages → Create application → Continue with GitHub**, pick this repository, then
+
+| Setting | Value |
+|---------|-------|
+| Project / Worker name | `temp-email-web` (must match `name` in `wrangler.jsonc`) |
+| Build command | `pnpm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Build variables | `VITE_API_BASE=https://<your worker domain>` |
+
+Every push to `main` builds and deploys. The API is called cross-origin (the worker allows CORS). Locally:
+`VITE_API_BASE=... pnpm run deploy`.
+
+### D. Separate origin
 
 Deploy `dist/` to any static host with an SPA fallback (all unknown paths → `index.html`) and set `API_BASE`
 (build-time or runtime) to the worker URL.

@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "build:telegram": "VITE_IS_TELEGRAM=true tsc -b && VITE_IS_TELEGRAM=true vite build"
+    "build:telegram": "VITE_IS_TELEGRAM=true tsc -b && VITE_IS_TELEGRAM=true vite build",
+    "deploy": "pnpm build && npx wrangler deploy"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^5.3.0",
@@ -52,5 +53,6 @@
     "oxlint": "^1.90.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.6"
-  }
+  },
+  "packageManager": "pnpm@11.14.0"
 }

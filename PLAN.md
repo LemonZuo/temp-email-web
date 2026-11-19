@@ -124,6 +124,7 @@
 - 2026-11-20：按用户要求：侧栏菜单分组可折叠（点分组标题，按模块记住状态，当前页所在分组自动展开，图标模式下忽略）；侧栏宽/窄模式（底部「收起菜单」按钮 + ⌘B/Ctrl+B，状态持久化；桌面端顶栏开关移除，仅手机端保留）。
 
 - 2026-11-20：写信正文输入框（纯文本 / HTML / 富文本）去掉聚焦光圈。
+- 2026-11-20：支持 Cloudflare 控制台「Continue with GitHub」部署（Workers 静态资源）：新增 `wrangler.jsonc`（`dist` + SPA 回退）、`.node-version`、`packageManager`、`deploy` 脚本；干净目录模拟 CI 安装/构建、`wrangler deploy --dry-run`、`wrangler dev` 深链刷新均通过。README 补部署方式 C。
 
 ## 下次继续（交接说明）
 

@@ -1,0 +1,11 @@
+// Deploys dist/ as a Worker with static assets (Cloudflare dashboard → Create application → Continue with GitHub).
+// The Worker name in the dashboard must match `name`. Set VITE_API_BASE as a *build* variable.
+{
+  "name": "temp-email-web",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths (/console/..., /user/...) return index.html so client-side routes survive a reload.
+    "not_found_handling": "single-page-application"
+  }
+}
