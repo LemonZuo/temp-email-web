@@ -233,7 +233,10 @@ export function ComposeForm({
               </Suspense>
             ) : (
               <Textarea
-                className={cn('min-h-[320px] resize-y', draft.contentType === 'html' && 'font-mono text-xs')}
+                className={cn(
+                  'min-h-[320px] resize-y focus-visible:border-input focus-visible:ring-0',
+                  draft.contentType === 'html' && 'font-mono text-xs',
+                )}
                 value={draft.content}
                 onChange={(e) => setDraft({ content: e.target.value })}
                 placeholder={draft.contentType === 'html' ? t('htmlPlaceholder') : t('contentPlaceholder')}

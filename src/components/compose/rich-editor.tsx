@@ -254,7 +254,7 @@ export function RichEditor({
 
   if (!editor) return null
   return (
-    <div className={cn('overflow-hidden rounded-lg border bg-background focus-within:ring-3 focus-within:ring-ring/30', className)}>
+    <div className={cn('overflow-hidden rounded-lg border bg-background', className)}>
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>
