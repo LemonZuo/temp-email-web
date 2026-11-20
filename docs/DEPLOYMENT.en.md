@@ -10,9 +10,9 @@ There are two ways to deploy. **Use only one of them**:
 
 | | A: GitHub Actions | B: Cloudflare connected repository |
 |---|---|---|
-| Deploys when | A `v*` tag is pushed, or on a manual run | Every push to `main` |
+| Deploys when | After a fork syncs, a `v*` tag is pushed, or on a manual run | Every push to `main` |
 | Configured in | GitHub repository secrets / variables | The Worker's build settings in Cloudflare |
-| Best for | Versioned releases (current setup) | Shipping every push |
+| Best for | Regular releases from a fork (current setup) | Shipping every push |
 
 ## Before you start
 
@@ -45,23 +45,30 @@ If the Worker does not exist yet, the first release creates it.
 
 ### Release
 
-Bump the version first (the `/about` page shows it as the frontend version), then tag and push:
+As upstream does, a push to `main` does not deploy. *Deploy* runs in three cases:
 
-```bash
-npm version 0.2.0 --no-git-tag-version
-git commit -am "chore: release v0.2.0"
-git tag v0.2.0
-git push origin main v0.2.0
-```
+- **After a fork syncs** (current setup): the fork deploys after each successful weekly sync. To ship right away, run
+  *Upstream Sync* by hand from the fork's *Actions* tab. See [Deploying from a fork](#deploying-from-a-fork).
+- **Manual run**: *Actions* → *Deploy* → *Run workflow*, then pick a branch or tag. Use this to redeploy after changing
+  `VITE_API_BASE`.
+- **Tag**: for marking a release. Bump the version first (the `/about` page shows it as the frontend version), then
+  push the tag to the repository that deploys:
 
-After the tag is pushed, *Deploy* runs under the repository's *Actions* tab. The new version in Cloudflare
-(Worker → *Deployments*) is labelled with the tag.
+  ```bash
+  npm version 0.2.0 --no-git-tag-version   # only edits package.json
+  git commit -am "chore: release v0.2.0"
+  git push origin main
+  git tag v0.2.0
+  git push origin v0.2.0                    # when deploying from a fork, push to the fork's remote
+  ```
 
-### Redeploy and roll back
+Every deployment adds an entry to the Cloudflare version history (Worker → *Deployments*); tag releases carry the tag
+name.
 
-- **Redeploy** (e.g. after changing `VITE_API_BASE`): *Actions* → *Deploy* → *Run workflow*, and pick the tag to deploy.
-- **Roll back**: pick an earlier version under Worker → *Deployments*; it takes effect immediately. Or run *Deploy*
-  again on an older tag.
+### Roll back
+
+Pick an earlier version under Worker → *Deployments*; it takes effect immediately. Or run *Deploy* by hand on an older
+tag.
 
 ## B: Cloudflare connected repository
 
@@ -117,11 +124,14 @@ After the tag is pushed, *Deploy* runs under the repository's *Actions* tab. The
 ## Deploying from a fork
 
 In a fork, *Upstream Sync* (`.github/workflows/sync.yaml`) syncs `main` from `berry-shake/temp-email-web` every Monday
-at 00:00 UTC, or on demand from the *Actions* tab. It does not run in the source repository.
+at 00:00 UTC, or on demand from the *Actions* tab. Both the sync and the deployment that follows it only run in forks;
+the source repository is not affected.
 
 - The first time, click **Sync fork** on the fork's GitHub page so the workflow itself reaches the fork.
-- Syncing only updates `main`: no tags, no deployment. With method A, push a tag in the fork to release; with method B,
-  Cloudflare builds after each sync.
+- Method A: *Deploy* runs after every successful sync. Without new commits it redeploys the same code, which is
+  harmless. A failed sync does not deploy.
+- Method B: Cloudflare builds once the sync updates `main`.
+- Tags from the source repository are not copied.
 - The default token cannot sync changes to files under `.github/workflows/`. For those, add the fork secret
   `UPSTREAM_SYNC_TOKEN`: a personal access token with the `repo` and `workflow` scopes.
 - If the fork's `main` has its own commits that conflict with the source, the sync fails and must be resolved by hand.
@@ -132,7 +142,7 @@ at 00:00 UTC, or on demand from the *Actions* tab. It does not run in the source
 `VITE_API_BASE` was missing at build time (or set as a runtime variable), so API requests go to the frontend's own
 domain. Configure it as above and rebuild.
 
-**Every push deploys, but I only want tag releases.**
+**I use method A, but every push deploys.**
 The Worker is still connected to the repository; disconnect it under Worker → *Settings* → *Build*.
 
 **Actions fails at Check configuration.**

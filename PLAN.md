@@ -135,6 +135,7 @@
 - 2026-11-20：新增 `docs/DEPLOYMENT.md`（中英双语），详细说明 GitHub Actions 打标签发布、Cloudflare 关联仓库构建两种部署方式，以及部署后检查（`FRONTEND_URL`、Turnstile 域名、OAuth2 回调、Telegram 小程序）、从旧前端迁移、常见问题；README 改为中英双语并精简，部署部分指向该文档。
 - 2026-11-20：新增 `.github/workflows/sync.yaml`（参考上游的 Upstream Sync）：只在 fork 中运行，每周一 00:00 UTC 或手动从 `berry-shake/temp-email-web` 同步 `main`；同步不复制标签、不触发部署。同步内容包含 workflow 改动时需在 fork 配置 `UPSTREAM_SYNC_TOKEN`（`repo` + `workflow` 权限）。说明见 `docs/DEPLOYMENT.md`「从 fork 部署」。
 - 2026-11-20：README 和部署文档改为中英分开两份（`README.md` / `README.en.md`，`docs/DEPLOYMENT.md` / `docs/DEPLOYMENT.en.md`，中文为主、顶部互链），并精简内容：路由与兼容说明并入部署文档「从旧前端迁移」，其他托管方式折叠显示，常见问题改为问答。
+- 2026-11-20：部署触发对齐上游：`deploy.yml` 增加 `workflow_run`（fork 中 Upstream Sync 成功后自动部署；源仓库和同步失败时跳过），保留 `v*` 标签和手动运行，推送 `main` 仍不部署。README 加「Deploy to Cloudflare」按钮（同上游，链接到部署文档；Cloudflare 真正的一键部署不支持构建变量 `VITE_API_BASE`，且复制出的仓库不是 fork、无法同步，故未采用）。
 
 ## 下次继续（交接说明）
 

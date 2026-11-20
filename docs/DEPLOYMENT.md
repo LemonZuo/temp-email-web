@@ -9,9 +9,9 @@
 
 | | 方式一：GitHub Actions | 方式二：Cloudflare 关联仓库 |
 |---|---|---|
-| 何时部署 | 推送 `v*` 标签，或手动运行 | 每次推送到 `main` |
+| 何时部署 | fork 同步完成后、推送 `v*` 标签、手动运行 | 每次推送到 `main` |
 | 配置位置 | GitHub 仓库的 Secrets / Variables | Cloudflare 上 Worker 的构建设置 |
-| 适合 | 按版本发布（当前使用） | 推送即上线 |
+| 适合 | 从 fork 定期上线（当前使用） | 推送即上线 |
 
 ## 准备
 
@@ -39,23 +39,28 @@
 
 Worker 还不存在的话，第一次发布时会自动创建。
 
-### 发布
+### 上线
 
-先改版本号（`/about` 页面显示的前端版本就是它），再打标签推送：
+和上游一样，推送到 `main` 不会部署。*Deploy* 有三种触发方式：
 
-```bash
-npm version 0.2.0 --no-git-tag-version
-git commit -am "chore: release v0.2.0"
-git tag v0.2.0
-git push origin main v0.2.0
-```
+- **fork 同步后自动部署**（当前用法）：fork 每周一同步成功后自动部署。想马上上线，就在 fork 的 *Actions* 里手动运行
+  *Upstream Sync*。详见[从 fork 部署](#从-fork-部署)。
+- **手动运行**：*Actions* → *Deploy* → *Run workflow*，选择分支或标签。改了 `VITE_API_BASE` 后也用这个重新部署。
+- **打标签**：想标记正式版本时使用。先改版本号（`/about` 页面显示的前端版本就是它），再把标签推送到部署所在的仓库：
 
-推送标签后，可以在仓库的 *Actions* 页面看到 *Deploy* 在运行。完成后 Cloudflare 的版本记录（Worker → *Deployments*）会标上这个标签。
+  ```bash
+  npm version 0.2.0 --no-git-tag-version   # 只改 package.json
+  git commit -am "chore: release v0.2.0"
+  git push origin main
+  git tag v0.2.0
+  git push origin v0.2.0                    # 从 fork 部署时，推送到 fork 对应的 remote
+  ```
 
-### 重新部署与回滚
+每次部署都会在 Cloudflare 的版本记录（Worker → *Deployments*）里留下一条，打标签发布的版本会带上标签名。
 
-- **重新部署**（比如改了 `VITE_API_BASE`）：*Actions* → *Deploy* → *Run workflow*，选择要部署的标签。
-- **回滚**：Worker → *Deployments* 里选旧版本回滚，立即生效；也可以对旧标签再运行一次 *Deploy*。
+### 回滚
+
+Worker → *Deployments* 里选旧版本回滚，立即生效；也可以对旧标签手动运行一次 *Deploy*。
 
 ## 方式二：Cloudflare 关联仓库
 
@@ -105,10 +110,12 @@ git push origin main v0.2.0
 ## 从 fork 部署
 
 fork 里的 *Upstream Sync*（`.github/workflows/sync.yaml`）每周一北京时间 08:00 自动从 `berry-shake/temp-email-web`
-同步 `main`，也可以在 *Actions* 页面手动运行。源仓库里它不会运行。
+同步 `main`，也可以在 *Actions* 页面手动运行。同步和同步后的自动部署都只在 fork 里运行，源仓库不受影响。
 
 - 第一次需要在 fork 的 GitHub 页面点一次 **Sync fork**，把这个 workflow 同步过去。
-- 同步只更新 `main`，不带标签，也不部署。方式一要在 fork 里自己打标签发布；方式二同步后会自动构建。
+- 方式一：同步成功后自动运行 *Deploy*；没有新提交时也会重新部署一次同样的代码，不影响使用。同步失败则不部署。
+- 方式二：同步更新 `main` 后，Cloudflare 自动构建。
+- 同步不会带上源仓库的标签。
 - 源仓库改了 `.github/workflows/` 下的文件时，默认令牌没有权限同步，需要在 fork 添加 Secret `UPSTREAM_SYNC_TOKEN`
   （勾选 `repo` 和 `workflow` 权限的个人访问令牌）。
 - fork 的 `main` 上有自己的提交并且和源仓库冲突时，同步会失败，需要手动处理。
@@ -118,7 +125,7 @@ fork 里的 *Upstream Sync*（`.github/workflows/sync.yaml`）每周一北京时
 **页面能打开，但设置加载失败？**
 构建时没拿到 `VITE_API_BASE`（或填成了运行时变量），接口请求发到了前端自己的域名。按上文配置后重新构建。
 
-**只想打标签部署，但每次推送都在部署？**
+**用的是方式一，但每次推送都在部署？**
 Worker 还关联着仓库，到 Worker → *Settings* → *Build* 断开。
 
 **Actions 在 Check configuration 步骤失败？**

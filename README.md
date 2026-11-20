@@ -47,8 +47,12 @@ pnpm build:telegram   # Telegram 小程序版本
 
 ## 部署
 
-以 Cloudflare Worker 静态资源的形式部署，支持 **GitHub Actions 打标签发布**（当前使用）和 **Cloudflare 关联仓库自动构建**
-两种方式，步骤见 [部署文档](./docs/DEPLOYMENT.md)。
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](./docs/DEPLOYMENT.md)
+
+以 Cloudflare Worker 静态资源的形式部署，有两种方式，步骤见[部署文档](./docs/DEPLOYMENT.md)：
+
+- **GitHub Actions**（当前使用）：fork 每周同步后自动部署，也可以手动运行或打标签发布
+- **Cloudflare 关联仓库**：每次推送到 `main` 自动构建上线
 
 ## 文档
 

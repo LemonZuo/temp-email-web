@@ -49,8 +49,12 @@ with the old frontend.
 
 ## Deployment
 
-Deployed as a Cloudflare Worker with static assets, either by **GitHub Actions on version tags** (current setup) or by
-**Cloudflare building the connected repository**. See the [deployment guide](./docs/DEPLOYMENT.en.md).
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](./docs/DEPLOYMENT.en.md)
+
+Deployed as a Cloudflare Worker with static assets, in one of two ways (see the [deployment guide](./docs/DEPLOYMENT.en.md)):
+
+- **GitHub Actions** (current setup): a fork deploys after its weekly sync; manual runs and tag releases also work
+- **Cloudflare connected repository**: every push to `main` builds and goes live
 
 ## Documentation
 
