@@ -139,6 +139,6 @@
 
 ## 下次继续（交接说明）
 
-1. 阶段 0–6 全部完成。可选后续：清理 lint 警告（27 条，均为 warning）；迁移旧版偏好设置键（`useUTCDate` 等，旧版 `autoLoadRemoteImages` 默认开启、新版默认关闭）；用设置了站点密码 / 管理员密码的 Worker 实测密码弹框流程。
+1. 阶段 0–6 全部完成。后续优化统一记在 [docs/IMPROVEMENTS.md](./docs/IMPROVEMENTS.md)（含原先列在这里的 lint 警告、旧版偏好设置迁移、密码弹框实测），按其中的优先级推进。
 2. 本地联调环境：`cloudflare_temp_email/e2e` 下 `docker compose -p tmweb up -d --build worker mailpit`，再 `POST /admin/db_initialize`、`/admin/db_migration`；前端 `DEV_PROXY_TARGET=http://localhost:8787 pnpm dev`。冒烟脚本在仓库外（`/tmp/tm-smoke`），后台免密（e2e 配置 `DISABLE_ADMIN_PASSWORD_CHECK=true`）。
 3. 规则：前端路由不能以后端前缀开头（后台在 `/console/*`，见 `docs/CONVENTIONS.md`）。
