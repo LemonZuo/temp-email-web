@@ -151,6 +151,8 @@
   - `<html lang>` 在首屏前按用户语言设置（原来固定为 `en`，iOS Safari 对中文页面弹出「从英语翻译」）。
   - 手机上底部提示让开 iOS Safari 浮动工具栏（`mobileOffset.bottom = 100lvh - 100dvh + 16px`）。
 
+- 2026-11-20：线上真机测试（`mail-next.lemonzuo.org`，只读操作）通过。修复：邮件列表摘要里营销邮件预览头的不可见填充字符（零宽字符、U+034F、软连字符等）不再显示成一大段空白，组合 emoji 用的 ZWJ 保留。
+
 ## 下次继续（交接说明）
 
 1. 阶段 0–6 全部完成。后续优化统一记在 [docs/IMPROVEMENTS.md](./docs/IMPROVEMENTS.md)（含原先列在这里的 lint 警告、旧版偏好设置迁移、密码弹框实测），按其中的优先级推进。

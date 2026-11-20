@@ -39,6 +39,13 @@ export type ParsedMail = RawMail & {
   attachments: MailAttachment[]
 }
 
+/**
+ * Invisible characters newsletters pad their preheader with (zero-width space / non-joiner, U+034F, soft hyphen,
+ * direction marks, word joiner, BOM...) so mail apps show only the teaser. `\s` does not match them, so the preview
+ * showed a long blank run before the ellipsis. ZWJ (U+200D) stays: it joins emoji sequences.
+ */
+const INVISIBLE_CHARS = /[\u00ad\u034f\u061c\u115f\u1160\u17b4\u17b5\u180b-\u180e\u200b\u200c\u200e\u200f\u202a-\u202e\u2060-\u2064\u3164\ufeff\uffa0]/g
+
 const toPreview = (text: string, html: string) => {
   let plain = text
   if (!plain && html) {
@@ -46,7 +53,7 @@ const toPreview = (text: string, html: string) => {
     doc.querySelectorAll('style,script,head,title').forEach((n) => n.remove())
     plain = doc.body?.textContent || ''
   }
-  return plain.replace(/\s+/g, ' ').trim().slice(0, 200)
+  return plain.replace(INVISIBLE_CHARS, '').replace(/\s+/g, ' ').trim().slice(0, 200)
 }
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
