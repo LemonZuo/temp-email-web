@@ -1,11 +1,11 @@
-// Cloudflare Pages project: serves dist/ (unknown paths fall back to index.html because there is no 404.html) and
-// forwards backend paths (/api/, /admin/ ...) to the backend Worker through the BACKEND service binding
-// (functions/_middleware.js, limited to those paths by public/_routes.json), so the API is same-origin.
-// Deployed by .github/workflows/deploy.yml or Cloudflare Pages Git integration (see docs/DEPLOYMENT.md).
+// Deploys dist/ as a Worker with static assets, either by .github/workflows/deploy.yml on `v*` tags or by Cloudflare
+// Workers Builds (see docs/DEPLOYMENT.md). VITE_API_BASE must be set at build time.
 {
   "name": "temp-email-web",
-  "pages_build_output_dir": "./dist",
   "compatibility_date": "2026-11-01",
-  // `service` must be the name of your deployed cloudflare_temp_email Worker
-  "services": [{ "binding": "BACKEND", "service": "cloudflare_temp_email" }]
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths (/console/..., /user/...) return index.html so client-side routes survive a reload.
+    "not_found_handling": "single-page-application"
+  }
 }

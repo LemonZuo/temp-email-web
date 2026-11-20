@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "build:telegram": "VITE_IS_TELEGRAM=true tsc -b && VITE_IS_TELEGRAM=true vite build",
-    "deploy": "pnpm build && npx wrangler pages deploy --branch main"
+    "deploy": "pnpm build && npx wrangler deploy"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^5.3.0",

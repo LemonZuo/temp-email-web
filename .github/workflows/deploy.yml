@@ -1,15 +1,14 @@
 name: Deploy
 
-# Builds and deploys to Cloudflare Pages, like upstream's deploy workflows (never on a plain push to main):
+# Builds and deploys to Cloudflare Workers, like upstream's deploy workflows (never on a plain push to main):
 #   - in a fork, after a successful Upstream Sync (weekly, or run it by hand to ship right away)
 #   - when a `v*` tag is pushed
 #   - when run manually
-# The Pages project (name in wrangler.jsonc) is created on the first run. API requests go to the backend Worker through
-# the service binding in wrangler.jsonc, so VITE_API_BASE is normally left unset.
+# Disconnect Cloudflare's own Git integration (Worker → Settings → Build), otherwise every push still deploys.
 #
 # Repository settings → Secrets and variables → Actions:
-#   secrets:   CLOUDFLARE_API_TOKEN (needs Account → Cloudflare Pages → Edit), CLOUDFLARE_ACCOUNT_ID
-#   variables: VITE_API_BASE (optional; only to call a backend on another origin instead of the service binding)
+#   secrets:   CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID
+#   variables: VITE_API_BASE (worker URL, e.g. https://mail-api.example.com)
 on:
   workflow_run:
     workflows: [Upstream Sync]
@@ -26,19 +25,11 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  # Pages production branch. Deployments are always made to it: tag builds have no branch and would otherwise
-  # become preview deployments.
-  PRODUCTION_BRANCH: main
-
 jobs:
   deploy:
     # After a sync: only in forks (the source repository has no Cloudflare credentials) and only if the sync succeeded
     if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.repository.fork) }}
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -55,12 +46,17 @@ jobs:
       - name: Check configuration
         run: |
           missing=""
+          [ -n "$VITE_API_BASE" ] || missing="$missing VITE_API_BASE(variable)"
           [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN(secret)"
           [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID(secret)"
           if [ -n "$missing" ]; then
             echo "::error::Missing repository settings:$missing"
             exit 1
           fi
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -70,24 +66,8 @@ jobs:
         env:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}
 
-      - name: Create Pages project if missing
-        run: |
-          project=$(sed -n 's/^ *"name": *"\([^"]*\)".*/\1/p' wrangler.jsonc | head -1)
-          projects=$(npx --yes wrangler@4 pages project list --json)
-          if echo "$projects" | node -e '
-            let s = ""
-            process.stdin.on("data", (d) => (s += d)).on("end", () => {
-              const list = JSON.parse(s.slice(s.indexOf("[")))
-              process.exit(list.some((p) => Object.values(p).includes(process.argv[1])) ? 0 : 1)
-            })' "$project"; then
-            echo "Pages project $project exists"
-          else
-            npx --yes wrangler@4 pages project create "$project" --production-branch "$PRODUCTION_BRANCH"
-          fi
-
       - name: Deploy ${{ github.ref_name }}
-        run: >-
-          npx --yes wrangler@4 pages deploy
-          --branch "$PRODUCTION_BRANCH"
-          --commit-hash "$GITHUB_SHA"
-          --commit-message "$GITHUB_REF_NAME ($GITHUB_EVENT_NAME)"
+        run: npx --yes wrangler@4 deploy --tag "$GITHUB_REF_NAME" --message "$GITHUB_REF_NAME ${GITHUB_SHA::7} ($GITHUB_EVENT_NAME)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

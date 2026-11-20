@@ -49,13 +49,12 @@ with the old frontend.
 
 ## Deployment
 
-Deployed as a Cloudflare Pages project. API requests go to the backend Worker through Pages Functions and a service
-binding, on the same origin as the pages, so no backend URL needs to be configured.
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](./docs/DEPLOYMENT.en.md)
 
-There are two ways to deploy (see the [deployment guide](./docs/DEPLOYMENT.en.md)):
+Deployed as a Cloudflare Worker with static assets, in one of two ways (see the [deployment guide](./docs/DEPLOYMENT.en.md)):
 
 - **GitHub Actions** (current setup): a fork deploys after its weekly sync; manual runs and tag releases also work
-- **Cloudflare Pages connected repository**: every push to `main` builds and goes live
+- **Cloudflare connected repository**: every push to `main` builds and goes live
 
 ## Documentation
 

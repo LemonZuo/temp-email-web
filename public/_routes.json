@@ -1,6 +1,0 @@
-{
-  "version": 1,
-  "description": "Only backend paths run Pages Functions (functions/_middleware.js); everything else is a static file",
-  "include": ["/api/*", "/open_api/*", "/user_api/*", "/admin/*", "/telegram/*", "/external/*", "/redeem_api/*"],
-  "exclude": []
-}

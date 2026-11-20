@@ -47,12 +47,12 @@ pnpm build:telegram   # Telegram 小程序版本
 
 ## 部署
 
-部署为 Cloudflare Pages 项目。接口请求通过 Pages Functions 和服务绑定转发给后端 Worker，与页面同源，不需要配置后端地址。
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](./docs/DEPLOYMENT.md)
 
-有两种部署方式，步骤见[部署文档](./docs/DEPLOYMENT.md)：
+以 Cloudflare Worker 静态资源的形式部署，有两种方式，步骤见[部署文档](./docs/DEPLOYMENT.md)：
 
 - **GitHub Actions**（当前使用）：fork 每周同步后自动部署，也可以手动运行或打标签发布
-- **Cloudflare Pages 关联仓库**：每次推送到 `main` 自动构建上线
+- **Cloudflare 关联仓库**：每次推送到 `main` 自动构建上线
 
 ## 文档
 
