@@ -1,6 +1,6 @@
-import { CopyIcon, ExternalLinkIcon, KeyRoundIcon, LinkIcon, SparklesIcon } from 'lucide-react'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { CheckIcon, CopyIcon, ExternalLinkIcon, KeyRoundIcon, LinkIcon, SparklesIcon, XIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { copyText } from '@/lib/clipboard'
 import type { AiExtract } from '@/lib/ai-extract'
@@ -15,6 +15,7 @@ const messages = defineMessages({
     otherLink: '链接',
     open: '打开',
     aiExtract: 'AI 提取',
+    copyLabel: '复制{label}',
   },
   en: {
     authCode: 'Verification code',
@@ -24,6 +25,7 @@ const messages = defineMessages({
     otherLink: 'Link',
     open: 'Open',
     aiExtract: 'AI extract',
+    copyLabel: 'Copy {label}',
   },
 })
 
@@ -35,14 +37,48 @@ const TYPE_KEYS = {
   other_link: 'otherLink',
 } as const
 
-/** Compact badge for list rows: shows verification codes inline. */
-export function AiExtractBadge({ extract }: { extract: AiExtract }) {
-  if (extract.type !== 'auth_code') return null
+/**
+ * Chip for list rows that copies the code / link right away. The row itself opens the mail, so clicks and the
+ * Enter / Space keys stop here (the row's key handler would otherwise open the mail and cancel the button press).
+ * The result shows on the chip itself (green check / red cross) instead of a toast.
+ */
+export function AiExtractCopyChip({ extract }: { extract: AiExtract }) {
+  const t = useT(messages)
+  const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(timer.current), [])
+  const isCode = extract.type === 'auth_code'
+  const label = t(TYPE_KEYS[extract.type as keyof typeof TYPE_KEYS] || 'otherLink')
+  const onCopy = async (e: MouseEvent) => {
+    e.stopPropagation()
+    const ok = await copyText(extract.result)
+    clearTimeout(timer.current)
+    setStatus(ok ? 'copied' : 'failed')
+    timer.current = setTimeout(() => setStatus('idle'), 1500)
+  }
+  const statusText = status === 'copied' ? t('copied') : status === 'failed' ? t('copyFailed') : t('copyLabel', { label })
   return (
-    <Badge variant="secondary" className="gap-1 font-mono">
-      <KeyRoundIcon className="size-3" />
-      {extract.result}
-    </Badge>
+    <Button
+      type="button"
+      size="xs"
+      variant="secondary"
+      onClick={onCopy}
+      onKeyDown={(e) => e.stopPropagation()}
+      title={isCode ? t('copyLabel', { label }) : extract.result}
+      aria-label={statusText}
+      data-status={status}
+      className="min-w-0 max-w-full rounded-full max-md:h-8 max-md:px-3"
+    >
+      {isCode ? <KeyRoundIcon /> : <LinkIcon />}
+      <span className={isCode ? 'font-mono tracking-wider' : 'truncate'}>{isCode ? extract.result : label}</span>
+      {status === 'copied' ? (
+        <CheckIcon className="text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
+      ) : status === 'failed' ? (
+        <XIcon className="text-destructive" strokeWidth={3} />
+      ) : (
+        <CopyIcon className="opacity-60" />
+      )}
+    </Button>
   )
 }
 

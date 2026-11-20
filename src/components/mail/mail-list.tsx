@@ -5,7 +5,7 @@ import type { ParsedMail } from '@/lib/mail-parser'
 import { formatShortDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { usePrefs } from '@/store/prefs'
-import { AiExtractBadge } from './ai-extract'
+import { AiExtractCopyChip } from './ai-extract'
 import { defineMessages, useT } from '@/i18n'
 
 const messages = defineMessages({
@@ -115,8 +115,8 @@ export function MailListItem({
           </p>
         )}
         {(extract || mail.attachments.length > 0) && (
-          <div className="mt-1.5 flex items-center gap-2">
-            {extract && <AiExtractBadge extract={extract} />}
+          <div className="mt-1.5 flex min-w-0 items-center gap-2">
+            {extract && <AiExtractCopyChip extract={extract} />}
             {mail.attachments.length > 0 && (
               <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                 <PaperclipIcon className="size-3" />
