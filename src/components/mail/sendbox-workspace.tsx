@@ -102,7 +102,7 @@ function SentReader({
         )}
       </div>
       <ScrollArea className="min-h-0 flex-1">
-        <article className="mx-auto grid max-w-4xl gap-4 p-4 md:p-6">
+        <article className="grid gap-4 p-4 md:p-6">
           <h2 className="text-xl font-semibold break-words">{mail.subject || t('noSubject')}</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
             {showSender && (

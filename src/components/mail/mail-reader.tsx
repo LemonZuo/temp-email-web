@@ -300,7 +300,7 @@ export function MailReader({
 
       {/* content */}
       <ScrollArea className="min-h-0 flex-1">
-        <article className="mx-auto grid max-w-4xl gap-5 p-4 md:p-6">
+        <article className="grid gap-5 p-4 md:p-6">
           <h2 className="text-xl leading-snug font-semibold break-words">{mail.subject || t('noSubject')}</h2>
           <div className="flex items-start gap-3">
             <SenderAvatar name={mail.senderName || mail.senderAddress} className="size-10" />
