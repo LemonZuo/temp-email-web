@@ -6,6 +6,8 @@ import {
   type DayButton,
   type Locale,
 } from "react-day-picker"
+import { enUS, zhCN } from "react-day-picker/locale"
+import { useLocale } from "@/i18n"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
@@ -24,6 +26,9 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
 }) {
   const defaultClassNames = getDefaultClassNames()
+  const appLocale = useLocale()
+  // Follow the app language unless the caller passes a locale explicitly.
+  locale ??= appLocale === "zh" ? zhCN : enUS
 
   return (
     <DayPicker
