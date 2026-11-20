@@ -169,3 +169,28 @@
     font-size: 16px;
   }
 }
+
+/*
+ * Phones: a wide table keeps its last column (row actions) in view while the rest scrolls sideways. The cell needs an
+ * opaque background, so the header tint (bg-muted/40), row hover (bg-muted/50) and selection (bg-muted) are mixed
+ * onto the page background here.
+ */
+@layer components {
+  @media (width < 48rem) {
+    .table-sticky-end tr > :last-child {
+      position: sticky;
+      right: 0;
+      background-color: var(--background);
+      box-shadow: inset 1px 0 0 var(--border);
+    }
+    .table-sticky-end thead tr > :last-child {
+      background-color: color-mix(in oklab, var(--muted) 40%, var(--background));
+    }
+    .table-sticky-end tbody tr:hover > :last-child {
+      background-color: color-mix(in oklab, var(--muted) 50%, var(--background));
+    }
+    .table-sticky-end tbody tr[data-state='selected'] > :last-child {
+      background-color: var(--muted);
+    }
+  }
+}

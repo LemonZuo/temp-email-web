@@ -232,7 +232,7 @@ export function AppShell({
         <SidebarFooter>
           {sidebarBottom}
           <SidebarWidthToggle />
-          <SidebarFooterLinks />
+          <SidebarFooterLinks adminLink={module !== 'admin'} />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>

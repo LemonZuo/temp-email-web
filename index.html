@@ -18,6 +18,23 @@
       } catch (e) {}
     </script>
     <script id="app-config" type="application/json">{}</script>
+    <script>
+      // Set <html lang> before the first paint, in the order src/i18n resolveLocale uses (saved choice, runtime config,
+      // build default, browser). With the initial "en", Safari offered to translate every Chinese page.
+      try {
+        var saved = (JSON.parse(localStorage.getItem('tm-prefs') || '{}').state || {}).locale
+        var runtime = JSON.parse(document.getElementById('app-config').textContent || '{}').DEFAULT_LANG
+        var build = '%VITE_DEFAULT_LANG%'
+        var picks = [saved, runtime, build.charAt(0) === '%' ? '' : build, navigator.language]
+        for (var i = 0; i < picks.length; i++) {
+          var lang = String(picks[i] || '').toLowerCase()
+          if (lang.indexOf('zh') === 0 || lang.indexOf('en') === 0) {
+            document.documentElement.lang = lang.indexOf('zh') === 0 ? 'zh-CN' : 'en'
+            break
+          }
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -16,6 +16,8 @@ import { isTelegramWebApp } from '@/features/telegram/telegram-web-app'
 import { AddressLoginForm, CreateAddressForm } from './components/address-forms'
 import { defineMessages, useT } from '@/i18n'
 
+const YEAR = new Date().getFullYear()
+
 const messages = defineMessages({
   zh: {
     defaultTitle: '临时邮箱',
@@ -32,6 +34,7 @@ const messages = defineMessages({
     userCenter: '用户中心',
     redeemTip: '使用兑换码可解锁高级权限',
     useRedeemCode: '使用兑换码',
+    adminLogin: '管理员登录',
     pleaseGetNewEmail: '请登录已有邮箱，或创建一个新的邮箱地址。',
     adminContact: '如需帮助请联系管理员：',
     createDisabled: '当前站点未开放创建邮箱，请登录已有邮箱。',
@@ -51,6 +54,7 @@ const messages = defineMessages({
     userCenter: 'User center',
     redeemTip: 'Use a redemption code to unlock advanced access.',
     useRedeemCode: 'Use redemption code',
+    adminLogin: 'Admin login',
     pleaseGetNewEmail: 'Log in to an existing mailbox or create a new address.',
     adminContact: 'Need help? Contact the admin: ',
     createDisabled: 'Creating mailboxes is disabled on this site. Please log in instead.',
@@ -99,13 +103,13 @@ export function MailboxLanding() {
             })}
           </ul>
         </div>
-        <div className="relative text-sm text-primary-foreground/70">© {new Date().getFullYear()} {openSettings.copyright}</div>
+        <div className="relative text-sm text-primary-foreground/70">© {YEAR} {openSettings.copyright}</div>
       </div>
 
       {/* form */}
       <div className="flex flex-col">
         <header className="flex h-14 items-center justify-between px-4 lg:justify-end">
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 select-none lg:hidden">
             <Logo className="size-7" />
             <span className="font-semibold">{title}</span>
           </div>
@@ -214,6 +218,20 @@ export function MailboxLanding() {
             )}
           </div>
         </div>
+        {/* phones hide the hero, so the copyright lives here too; the admin link is the one-tap way in on a new device */}
+        <footer className="flex items-center justify-center gap-1 px-4 pb-4 text-xs text-muted-foreground lg:justify-end lg:px-6">
+          <span className="lg:hidden">© {YEAR} {openSettings.copyright}</span>
+          {!showAdminPage && !telegram && (
+            <>
+              <span aria-hidden className="lg:hidden">
+                ·
+              </span>
+              <Link to={adminPath()} className="inline-flex h-9 items-center px-1 hover:text-foreground hover:underline">
+                {t('adminLogin')}
+              </Link>
+            </>
+          )}
+        </footer>
       </div>
     </div>
   )

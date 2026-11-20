@@ -16,9 +16,20 @@ const BASE_STYLE = `
 `
 
 /**
+ * Newsletters are often a fixed 600px table. Chromium shrinks those with `max-width`, but WebKit (every iPhone
+ * browser) ignores max-width on tables, so like mail apps the body is zoomed out until it fits the pane.
+ */
+function fitToWidth(mailRoot: HTMLElement) {
+  mailRoot.style.zoom = ''
+  const available = mailRoot.clientWidth
+  const needed = mailRoot.scrollWidth
+  if (available > 0 && needed > available + 1) mailRoot.style.zoom = String(available / needed)
+}
+
+/**
  * Renders already-sanitized mail HTML inside a Shadow DOM so mail CSS cannot leak into the app
  * (and app CSS does not restyle the mail). Always light: most mail HTML assumes white paper.
- * Links open in a new tab.
+ * Links open in a new tab. Content wider than the pane is zoomed out to fit (see {@link fitToWidth}).
  */
 export function MailHtml({ html, className }: { html: string; className?: string }) {
   const hostRef = useRef<HTMLDivElement>(null)
@@ -38,6 +49,24 @@ export function MailHtml({ html, className }: { html: string; className?: string
     const content = `<style>${BASE_STYLE}</style><div class="mail-root">${html}</div>`
     if (root) root.innerHTML = content
     else host.innerHTML = content
+
+    const mailRoot = (root ?? host).querySelector<HTMLElement>('.mail-root')
+    if (!mailRoot) return
+    const fit = () => fitToWidth(mailRoot)
+    fit()
+    // Re-fit when the pane width changes (not its height, which the zoom itself changes) and when an image loads.
+    let width = host.clientWidth
+    const observer = new ResizeObserver(() => {
+      if (host.clientWidth === width) return
+      width = host.clientWidth
+      fit()
+    })
+    observer.observe(host)
+    mailRoot.addEventListener('load', fit, true)
+    return () => {
+      observer.disconnect()
+      mailRoot.removeEventListener('load', fit, true)
+    }
   }, [html])
 
   useEffect(() => {
@@ -56,7 +85,7 @@ export function MailHtml({ html, className }: { html: string; className?: string
     return () => host.removeEventListener('click', onClick)
   }, [])
 
-  // overflow-x: content that cannot shrink (fixed min-width layouts) scrolls inside the card instead of being clipped
+  // overflow-x: a fallback should zoom be unsupported; the content then scrolls inside the card instead of being clipped
   return <div ref={hostRef} className={cn('overflow-x-auto rounded-lg bg-white p-4 text-left', className)} />
 }
 

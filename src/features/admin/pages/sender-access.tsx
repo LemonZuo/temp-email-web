@@ -206,7 +206,7 @@ export default function SenderAccessPage() {
       </div>
 
       <div className="overflow-x-auto rounded-xl border">
-        <Table className="min-w-[680px]">
+        <Table className="table-sticky-end min-w-[680px]">
           <TableHeader>
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableHead className="w-16">{t('id')}</TableHead>

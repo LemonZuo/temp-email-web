@@ -56,7 +56,8 @@ export default function App() {
         <SiteAuthDialog />
         <ConfirmHost />
         <AnnouncementToast />
-        <Toaster position="top-center" richColors closeButton />
+        {/* bottom toasts on phones: iOS Safari's toolbars float over fixed content; lvh - dvh is their current height */}
+        <Toaster position="top-center" richColors closeButton mobileOffset={{ bottom: 'calc(100lvh - 100dvh + 16px)' }} />
       </TooltipProvider>
     </QueryClientProvider>
   )

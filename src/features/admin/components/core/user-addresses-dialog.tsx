@@ -141,7 +141,7 @@ export function UserAddressesDialog({
           </p>
         ) : (
           <div className="overflow-x-auto rounded-xl border">
-            <Table className="min-w-[520px]">
+            <Table className="table-sticky-end min-w-[520px]">
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40">
                   <TableHead>{t('emailAddress')}</TableHead>

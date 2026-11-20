@@ -376,7 +376,7 @@ export default function AccountsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-xl border">
-        <Table className="min-w-[1000px]">
+        <Table className="table-sticky-end min-w-[1000px]">
           <TableHeader>
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableHead className="w-10">

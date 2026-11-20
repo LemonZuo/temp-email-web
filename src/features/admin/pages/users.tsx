@@ -348,7 +348,7 @@ export default function UsersPage() {
       </div>
 
       <div className="overflow-x-auto rounded-xl border">
-        <Table className="min-w-[760px]">
+        <Table className="table-sticky-end min-w-[760px]">
           <TableHeader>
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableHead className="w-16">{t('id')}</TableHead>

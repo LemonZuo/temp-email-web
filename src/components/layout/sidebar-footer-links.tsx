@@ -1,5 +1,7 @@
+import { Link } from 'react-router'
 import { ActivityIcon } from 'lucide-react'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
+import { adminPath } from '@/features/admin/paths'
 import { useApp, useFlags } from '@/store/app'
 import { defineMessages, useT } from '@/i18n'
 
@@ -11,12 +13,15 @@ function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
+const YEAR = new Date().getFullYear()
+
 const messages = defineMessages({
-  zh: { status: '服务状态', github: 'GitHub' },
-  en: { status: 'Status', github: 'GitHub' },
+  zh: { status: '服务状态', github: 'GitHub', adminLogin: '管理员登录' },
+  en: { status: 'Status', github: 'GitHub', adminLogin: 'Admin login' },
 })
 
-export function SidebarFooterLinks() {
+/** `adminLink`: offer the admin console next to the copyright while no visible admin entry exists (new device). */
+export function SidebarFooterLinks({ adminLink = true }: { adminLink?: boolean }) {
   const t = useT(messages)
   const openSettings = useApp((s) => s.openSettings)
   const { showAdminPage } = useFlags()
@@ -46,8 +51,18 @@ export function SidebarFooterLinks() {
           </SidebarMenuButton>
         </SidebarMenuItem>
       )}
-      <div className="px-2 pt-1 text-[11px] text-muted-foreground group-data-[collapsible=icon]:hidden">
-        © {new Date().getFullYear()} {openSettings.copyright}
+      <div className="flex items-center gap-1 px-2 pt-1 text-[11px] text-muted-foreground group-data-[collapsible=icon]:hidden">
+        <span className="truncate">
+          © {YEAR} {openSettings.copyright}
+        </span>
+        {adminLink && !showAdminPage && (
+          <>
+            <span aria-hidden>·</span>
+            <Link to={adminPath()} className="inline-flex h-7 shrink-0 items-center hover:text-foreground hover:underline">
+              {t('adminLogin')}
+            </Link>
+          </>
+        )}
       </div>
     </SidebarMenu>
   )

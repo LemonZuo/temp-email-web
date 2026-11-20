@@ -144,7 +144,7 @@ export function ModuleSwitcher({ current }: { current: ModuleKey }) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+            <SidebarMenuButton size="lg" className="select-none data-[state=open]:bg-sidebar-accent">
               <Logo adminTap={logoTap} isolate />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{title}</span>
