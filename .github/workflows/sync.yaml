@@ -4,7 +4,7 @@ name: Upstream Sync
 # demand from the Actions tab. In the source repository the job is skipped.
 # GITHUB_TOKEN cannot update files under .github/workflows/, so a sync that includes workflow changes fails; add the
 # repository secret UPSTREAM_SYNC_TOKEN (a personal access token with the `repo` and `workflow` scopes) to fix that.
-# Syncing does not copy tags and does not deploy; see "Deploying from a fork" in docs/DEPLOYMENT.en.md.
+# A successful sync triggers the Deploy workflow; tags are not copied. See "Deploying from a fork" in docs/DEPLOYMENT.en.md.
 on:
   schedule:
     - cron: "0 0 * * 1"

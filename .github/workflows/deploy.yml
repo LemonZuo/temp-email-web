@@ -1,12 +1,18 @@
 name: Deploy
 
-# Builds and deploys to Cloudflare Workers only when a version tag is pushed (or when run manually).
+# Builds and deploys to Cloudflare Workers, like upstream's deploy workflows (never on a plain push to main):
+#   - in a fork, after a successful Upstream Sync (weekly, or run it by hand to ship right away)
+#   - when a `v*` tag is pushed
+#   - when run manually
 # Disconnect Cloudflare's own Git integration (Worker → Settings → Build), otherwise every push still deploys.
 #
 # Repository settings → Secrets and variables → Actions:
 #   secrets:   CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID
 #   variables: VITE_API_BASE (worker URL, e.g. https://mail-api.example.com)
 on:
+  workflow_run:
+    workflows: [Upstream Sync]
+    types: [completed]
   push:
     tags:
       - "v*"
@@ -21,6 +27,8 @@ permissions:
 
 jobs:
   deploy:
+    # After a sync: only in forks (the source repository has no Cloudflare credentials) and only if the sync succeeded
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.repository.fork) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -59,7 +67,7 @@ jobs:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}
 
       - name: Deploy ${{ github.ref_name }}
-        run: npx --yes wrangler@4 deploy --tag "$GITHUB_REF_NAME" --message "$GITHUB_REF_NAME ${GITHUB_SHA::7}"
+        run: npx --yes wrangler@4 deploy --tag "$GITHUB_REF_NAME" --message "$GITHUB_REF_NAME ${GITHUB_SHA::7} ($GITHUB_EVENT_NAME)"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
