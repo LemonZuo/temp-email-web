@@ -136,6 +136,11 @@
 - 2026-11-20：新增 `.github/workflows/sync.yaml`（参考上游的 Upstream Sync）：只在 fork 中运行，每周一 00:00 UTC 或手动从 `berry-shake/temp-email-web` 同步 `main`；同步不复制标签、不触发部署。同步内容包含 workflow 改动时需在 fork 配置 `UPSTREAM_SYNC_TOKEN`（`repo` + `workflow` 权限）。说明见 `docs/DEPLOYMENT.md`「从 fork 部署」。
 - 2026-11-20：README 和部署文档改为中英分开两份（`README.md` / `README.en.md`，`docs/DEPLOYMENT.md` / `docs/DEPLOYMENT.en.md`，中文为主、顶部互链），并精简内容：路由与兼容说明并入部署文档「从旧前端迁移」，其他托管方式折叠显示，常见问题改为问答。
 - 2026-11-20：部署触发对齐上游：`deploy.yml` 增加 `workflow_run`（fork 中 Upstream Sync 成功后自动部署；源仓库和同步失败时跳过），保留 `v*` 标签和手动运行，推送 `main` 仍不部署。README 加「Deploy to Cloudflare」按钮（同上游，链接到部署文档；Cloudflare 真正的一键部署不支持构建变量 `VITE_API_BASE`，且复制出的仓库不是 fork、无法同步，故未采用）。
+- 2026-11-20：部署从 Worker 静态资源改为 **Cloudflare Pages 同源部署**。
+  - 配置：`wrangler.jsonc` 改为 Pages 配置（`pages_build_output_dir` + 指向后端 `cloudflare_temp_email` 的服务绑定 `BACKEND`）；`pages/functions` 移到根目录 `functions/`，删除 `pages/`；新增 `public/_routes.json`，只有接口路径才运行 Functions。
+  - 部署：`deploy.yml` 改用 `wrangler pages deploy --branch main`，Pages 项目不存在时自动创建，`VITE_API_BASE` 改为可选；`deploy` 脚本同步修改。
+  - 文档：重写中英文部署文档，README 删除 Workers 一键部署按钮，改进清单第 10 项标记为不再适用。
+  - 验证：本地 `wrangler pages dev` 加一个转发到 e2e 后端的同名 Worker，SPA 回退、接口转发、后台统计和邮件列表都通过，所有接口请求都发往前端自己的域名。
 
 ## 下次继续（交接说明）
 

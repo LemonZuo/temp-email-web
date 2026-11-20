@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   // Dev only: proxy backend paths to a running worker so API_BASE can stay empty
   const proxyTarget = env.DEV_PROXY_TARGET
-  // Same prefixes as pages/functions/_middleware.js (trailing slash), so `/admin` and `/console/*` stay SPA routes.
+  // Same prefixes as functions/_middleware.js (trailing slash), so `/admin` and `/console/*` stay SPA routes.
   const proxyPattern = '^/(api|open_api|user_api|admin|telegram|external|redeem_api)/|^/health_check$'
   return {
     plugins: [react(), tailwindcss()],

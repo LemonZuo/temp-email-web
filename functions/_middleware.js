@@ -1,5 +1,6 @@
 // Same as cloudflare_temp_email/pages/functions/_middleware.js: forward backend paths to the Worker
-// through the `BACKEND` service binding; everything else is served from dist/ (SPA fallback).
+// through the `BACKEND` service binding (wrangler.jsonc); everything else is served from dist/ (SPA fallback).
+// public/_routes.json limits Functions to these paths, so static files never invoke this middleware.
 const API_PATHS = [
     "/api/",
     "/open_api/",
