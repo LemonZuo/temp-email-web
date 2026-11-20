@@ -1,5 +1,5 @@
-// Deploys dist/ as a Worker with static assets (Cloudflare dashboard → Create application → Continue with GitHub).
-// The Worker name in the dashboard must match `name`. Set VITE_API_BASE as a *build* variable.
+// Deploys dist/ as a Worker with static assets. Released by .github/workflows/deploy.yml when a `v*` tag is pushed
+// (see README → Deployment C). VITE_API_BASE must be set at build time.
 {
   "name": "temp-email-web",
   "compatibility_date": "2026-11-01",

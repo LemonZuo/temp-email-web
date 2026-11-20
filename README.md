@@ -85,20 +85,34 @@ run_worker_first = true
 
 The worker returns `index.html` for every non-API path without a file extension.
 
-### C. Cloudflare Workers via GitHub (Workers Builds)
+### C. Cloudflare Workers (static assets)
 
-`wrangler.jsonc` deploys `dist/` as a Worker with static assets and an SPA fallback. In the Cloudflare dashboard:
-**Workers & Pages → Create application → Continue with GitHub**, pick this repository, then
+`wrangler.jsonc` deploys `dist/` as a Worker named `temp-email-web` with static assets and an SPA fallback. The API
+is called cross-origin (the worker allows CORS), so `VITE_API_BASE` must be set at build time.
 
-| Setting | Value |
-|---------|-------|
-| Project / Worker name | `temp-email-web` (must match `name` in `wrangler.jsonc`) |
-| Build command | `pnpm run build` |
-| Deploy command | `npx wrangler deploy` |
-| Build variables | `VITE_API_BASE=https://<your worker domain>` |
+**Release on tags (current setup).** `.github/workflows/deploy.yml` builds and deploys only when a `v*` tag is pushed
+(or when run manually from the Actions tab):
 
-Every push to `main` builds and deploys. The API is called cross-origin (the worker allows CORS). Locally:
-`VITE_API_BASE=... pnpm run deploy`.
+1. Cloudflare: if the Worker was created with *Continue with GitHub*, disconnect it under
+   **Worker → Settings → Build**, otherwise every push to `main` still deploys.
+2. GitHub → repository **Settings → Secrets and variables → Actions**:
+   - secrets `CLOUDFLARE_API_TOKEN` (API token from the *Edit Cloudflare Workers* template) and `CLOUDFLARE_ACCOUNT_ID`
+   - variable `VITE_API_BASE` = `https://<your worker domain>`
+3. Release:
+
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
+The git tag is recorded on the Cloudflare Worker version (`wrangler deploy --tag`), so a deployment can be traced
+back to its tag; rolling back is done from **Worker → Deployments**.
+
+**Deploy on every push (Workers Builds).** Alternatively keep the dashboard flow **Workers & Pages → Create
+application → Continue with GitHub** with build command `pnpm run build`, deploy command `npx wrangler deploy` and
+the build variable `VITE_API_BASE`.
+
+Locally: `VITE_API_BASE=... pnpm run deploy`.
 
 ### D. Separate origin
 
