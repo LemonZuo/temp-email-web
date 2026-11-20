@@ -1,6 +1,5 @@
 import { ActivityIcon } from 'lucide-react'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
-import { APP_CONFIG } from '@/lib/config'
 import { useApp, useFlags } from '@/store/app'
 import { defineMessages, useT } from '@/i18n'
 
@@ -22,7 +21,8 @@ export function SidebarFooterLinks() {
   const openSettings = useApp((s) => s.openSettings)
   const { showAdminPage } = useFlags()
   const showGithub = openSettings.showGithub && (openSettings.showGithubForUser || showAdminPage)
-  const version = APP_CONFIG.VERSION ? `v${APP_CONFIG.VERSION}` : ''
+  // The link points to the upstream project, so show the deployed worker's version (frontend version is on /about).
+  const version = openSettings.version && (openSettings.version.startsWith('v') ? openSettings.version : `v${openSettings.version}`)
   return (
     <SidebarMenu>
       {openSettings.statusUrl && (
