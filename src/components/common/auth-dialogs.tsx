@@ -31,18 +31,18 @@ const messages = defineMessages({
   },
 })
 
+/**
+ * Password prompt that cannot be dismissed (no close button, outside click or Escape);
+ * it only goes away when `submit` succeeds and reloads the page.
+ */
 function PasswordDialog({
   open,
-  closable,
-  onOpenChange,
   icon,
   title,
   description,
   submit,
 }: {
   open: boolean
-  closable: boolean
-  onOpenChange: (open: boolean) => void
   icon: React.ReactNode
   title: string
   description: string
@@ -69,8 +69,12 @@ function PasswordDialog({
     }
   }
   return (
-    <Dialog open={open} onOpenChange={(o) => (closable || o) && onOpenChange(o)}>
-      <DialogContent showCloseButton={closable} onInteractOutside={(e) => !closable && e.preventDefault()}>
+    <Dialog open={open}>
+      <DialogContent
+        showCloseButton={false}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <form onSubmit={onSubmit} className="grid gap-5">
           <DialogHeader>
             <div className="mb-2 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">{icon}</div>
@@ -109,8 +113,6 @@ export function SiteAuthDialog() {
   return (
     <PasswordDialog
       open={open}
-      closable={false}
-      onOpenChange={(o) => useApp.getState().set({ showSiteAuth: o })}
       icon={<KeyRoundIcon className="size-5" />}
       title={t('siteTitle')}
       description={t('siteTip')}
@@ -123,18 +125,13 @@ export function SiteAuthDialog() {
   )
 }
 
-/** Admin password (x-admin-auth). */
-export function AdminAuthDialog({ onCancel }: { onCancel?: () => void }) {
+/** Admin password (x-admin-auth). Cannot be dismissed — the admin console is empty without it. */
+export function AdminAuthDialog() {
   const t = useT(messages)
   const open = useApp((s) => s.showAdminAuth)
   return (
     <PasswordDialog
       open={open}
-      closable
-      onOpenChange={(o) => {
-        useApp.getState().set({ showAdminAuth: o })
-        if (!o) onCancel?.()
-      }}
       icon={<ShieldCheckIcon className="size-5" />}
       title={t('adminTitle')}
       description={t('adminTip')}
