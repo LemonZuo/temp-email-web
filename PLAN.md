@@ -133,6 +133,8 @@
 - 2026-11-20：统计页日期选择弹层去掉 UTC 标签（页面说明里已注明按 UTC 日期统计）。
 - 2026-11-20：部署改为只在推送 `v*` tag 时触发：新增 GitHub Actions `.github/workflows/deploy.yml`（构建 + `wrangler deploy --tag`，也可在 Actions 页手动运行；缺少配置时直接报错）。需在 Cloudflare 断开 Worker 的 Git 自动构建，并在 GitHub 仓库配置 `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`（secrets）和 `VITE_API_BASE`（variable）。README 部署方式 C 已更新。
 - 2026-11-20：新增 `docs/DEPLOYMENT.md`（中英双语），详细说明 GitHub Actions 打标签发布、Cloudflare 关联仓库构建两种部署方式，以及部署后检查（`FRONTEND_URL`、Turnstile 域名、OAuth2 回调、Telegram 小程序）、从旧前端迁移、常见问题；README 改为中英双语并精简，部署部分指向该文档。
+- 2026-11-20：新增 `.github/workflows/sync.yaml`（参考上游的 Upstream Sync）：只在 fork 中运行，每周一 00:00 UTC 或手动从 `berry-shake/temp-email-web` 同步 `main`；同步不复制标签、不触发部署。同步内容包含 workflow 改动时需在 fork 配置 `UPSTREAM_SYNC_TOKEN`（`repo` + `workflow` 权限）。说明见 `docs/DEPLOYMENT.md`「从 fork 部署」。
+- 2026-11-20：README 和部署文档改为中英分开两份（`README.md` / `README.en.md`，`docs/DEPLOYMENT.md` / `docs/DEPLOYMENT.en.md`，中文为主、顶部互链），并精简内容：路由与兼容说明并入部署文档「从旧前端迁移」，其他托管方式折叠显示，常见问题改为问答。
 
 ## 下次继续（交接说明）
 
