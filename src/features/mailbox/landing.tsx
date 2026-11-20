@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router'
-import { GiftIcon, InboxIcon, LockKeyholeIcon, ShieldCheckIcon, SparklesIcon, TriangleAlertIcon, UserRoundIcon, ZapIcon } from 'lucide-react'
+import { GiftIcon, InboxIcon, LockKeyholeIcon, ShieldCheckIcon, ShieldIcon, SparklesIcon, TriangleAlertIcon, UserRoundIcon, ZapIcon } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,6 +10,7 @@ import { LanguageToggle, ThemeToggle } from '@/components/layout/header-controls
 import { sanitizeHtml } from '@/lib/sanitize'
 import { useApp, useFlags } from '@/store/app'
 import { useAuth } from '@/store/auth'
+import { adminPath } from '@/features/admin/paths'
 import { TelegramAddressPanel } from '@/features/telegram/telegram-address-panel'
 import { isTelegramWebApp } from '@/features/telegram/telegram-web-app'
 import { AddressLoginForm, CreateAddressForm } from './components/address-forms'
@@ -63,7 +64,7 @@ export function MailboxLanding() {
   const openSettings = useApp((s) => s.openSettings)
   const userEmail = useApp((s) => s.userSettings.user_email)
   const jwt = useAuth((s) => s.jwt)
-  const { showUserSystem, showUserMailboxes } = useFlags()
+  const { showUserSystem, showUserMailboxes, showAdminPage } = useFlags()
   const title = openSettings.title || t('defaultTitle')
   const canCreate = openSettings.enableUserCreateEmail && !(openSettings.disableAnonymousUserCreateEmail && !userEmail)
   const telegram = isTelegramWebApp()
@@ -114,6 +115,14 @@ export function MailboxLanding() {
                 <Link to="/user">
                   <UserRoundIcon />
                   {t('userCenter')}
+                </Link>
+              </Button>
+            )}
+            {showAdminPage && !telegram && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link to={adminPath()}>
+                  <ShieldIcon />
+                  {t('admin')}
                 </Link>
               </Button>
             )}
