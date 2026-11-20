@@ -47,11 +47,19 @@ export type ParsedMail = RawMail & {
 // eslint-disable-next-line no-misleading-character-class -- lone combining marks (U+034F...) are exactly the padding to drop
 const INVISIBLE_CHARS = /[\u00ad\u034f\u061c\u115f\u1160\u17b4\u17b5\u180b-\u180e\u200b\u200c\u200e\u200f\u202a-\u202e\u2060-\u2064\u3164\ufeff\uffa0]/g
 
+/** Elements that end a line when rendered; `textContent` ignores layout, so `<h1>A</h1><p>B</p>` would read "AB". */
+const BREAKING_TAGS =
+  'address,article,aside,blockquote,br,dd,div,dl,dt,figcaption,figure,footer,h1,h2,h3,h4,h5,h6,header,hr,li,main,nav,ol,p,pre,section,table,td,th,tr,ul'
+
 const toPreview = (text: string, html: string) => {
   let plain = text
   if (!plain && html) {
     const doc = new DOMParser().parseFromString(html, 'text/html')
     doc.querySelectorAll('style,script,head,title').forEach((n) => n.remove())
+    doc.body?.querySelectorAll(BREAKING_TAGS).forEach((n) => {
+      n.before(' ')
+      n.after(' ')
+    })
     plain = doc.body?.textContent || ''
   }
   return plain.replace(INVISIBLE_CHARS, '').replace(/\s+/g, ' ').trim().slice(0, 200)
