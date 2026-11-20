@@ -108,6 +108,8 @@ export type MailWorkspaceProps = {
   listHeader?: React.ReactNode
   emptyTitle?: string
   emptyDescription?: string
+  /** Open the first mail right away (`?mail_id=` links). Otherwise nothing is opened until the user picks a mail. */
+  autoOpenFirst?: boolean
 }
 
 /** Inbox-style list + reader for any endpoint returning raw mails. */
@@ -123,6 +125,7 @@ export function MailWorkspace({
   listHeader,
   emptyTitle,
   emptyDescription,
+  autoOpenFirst,
 }: MailWorkspaceProps) {
   const t = useT(messages)
   const isMobile = useIsMobile()
@@ -153,12 +156,13 @@ export function MailWorkspace({
 
   const selected = filtered.find((m) => m.id === selectedId) || items.find((m) => m.id === selectedId) || null
 
-  // Desktop: keep the reader populated with the newest mail
-  useEffect(() => {
-    if (isMobile || selectMode) return
-    if (filtered.length > 0 && !filtered.some((m) => m.id === selectedId)) setSelectedId(filtered[0].id)
-    if (filtered.length === 0 && selectedId !== null) setSelectedId(null)
-  }, [filtered, isMobile, selectMode, selectedId])
+  // `?mail_id=` links open their mail once; closing it (mobile back) does not reopen it
+  const autoOpenId = autoOpenFirst && !selectMode ? (filtered[0]?.id ?? null) : null
+  const [autoOpened, setAutoOpened] = useState<number | null>(null)
+  if (autoOpenId !== null && autoOpenId !== autoOpened) {
+    setAutoOpened(autoOpenId)
+    setSelectedId(autoOpenId)
+  }
 
   useEffect(() => setReadOverride({}), [items])
 

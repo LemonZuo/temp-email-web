@@ -70,6 +70,7 @@ export default function InboxPage() {
     <MailWorkspace
       queryKey={['mailbox', address, 'inbox', { mailId }]}
       fetchMails={fetchMails}
+      autoOpenFirst={!!mailId}
       deleteMail={openSettings.enableUserDeleteEmail ? (id) => api.delete(`/api/mails/${id}`) : undefined}
       markRead={
         openSettings.enableMailReadStatus ? (id, isUnread) => api.patch(`/api/mails/${id}/read`, { isUnread }) : undefined
