@@ -1,0 +1,25 @@
+name: Upstream Sync
+
+# Runs only in forks: brings the fork's main up to date with berry-shake/temp-email-web every Monday 00:00 UTC, or on
+# demand from the Actions tab. In the source repository the job is skipped.
+# GITHUB_TOKEN cannot update files under .github/workflows/, so a sync that includes workflow changes fails; add the
+# repository secret UPSTREAM_SYNC_TOKEN (a personal access token with the `repo` and `workflow` scopes) to fix that.
+# Syncing does not copy tags and does not deploy; see "Deploying from a fork" in docs/DEPLOYMENT.en.md.
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  sync_latest_from_upstream:
+    name: Sync latest commits from upstream repo
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Sync upstream changes
+        run: gh repo sync ${{ github.repository }} --source berry-shake/temp-email-web --branch main
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
