@@ -36,7 +36,7 @@ import { downloadEml, getAiExtract, type MailAttachment, type ParsedMail } from 
 import { formatDateTime } from '@/lib/format'
 import { usePrefs } from '@/store/prefs'
 import { AiExtractCard } from './ai-extract'
-import { MailHtml } from './mail-html'
+import { MailHtml, READER_MAIL_FRAME } from './mail-html'
 import { SenderAvatar } from './mail-list'
 import { defineMessages, useT } from '@/i18n'
 
@@ -115,7 +115,7 @@ function IconAction({ label, onClick, children, disabled }: { label: string; onC
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-sm" onClick={onClick} disabled={disabled} aria-label={label}>
+        <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={onClick} disabled={disabled} aria-label={label}>
           {children}
         </Button>
       </TooltipTrigger>
@@ -166,7 +166,8 @@ function AttachmentChip({ attachment, onSaveToS3 }: { attachment: MailAttachment
   )
 }
 
-function MailBody({ mail, showText }: { mail: ParsedMail; showText: boolean }) {
+/** `inPane`: rendered in the reader pane (edge-to-edge on phones), not the fullscreen dialog. */
+function MailBody({ mail, showText, inPane }: { mail: ParsedMail; showText: boolean; inPane?: boolean }) {
   const t = useT(messages)
   const autoLoad = usePrefs((s) => s.autoLoadRemoteImages)
   // Per-mail consent; resets when another mail is shown (component is keyed by mail id)
@@ -183,7 +184,7 @@ function MailBody({ mail, showText }: { mail: ParsedMail; showText: boolean }) {
     )
   }
   return (
-    <div className="grid gap-3">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
       {processed.blocked > 0 && !allow && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm">
           <ImageOffIcon className="size-4 text-amber-600 dark:text-amber-400" />
@@ -193,7 +194,7 @@ function MailBody({ mail, showText }: { mail: ParsedMail; showText: boolean }) {
           </Button>
         </div>
       )}
-      <MailHtml html={processed.html} className="border" />
+      <MailHtml html={processed.html} className={inPane ? READER_MAIL_FRAME : 'border'} />
     </div>
   )
 }
@@ -236,13 +237,13 @@ export function MailReader({
           </IconAction>
         )}
         {onReply && (
-          <Button variant="ghost" size="sm" onClick={onReply}>
+          <Button variant="ghost" size="sm" className="max-sm:size-9" onClick={onReply} aria-label={t('reply')}>
             <ReplyIcon />
             <span className="hidden sm:inline">{t('reply')}</span>
           </Button>
         )}
         {onForward && (
-          <Button variant="ghost" size="sm" onClick={onForward}>
+          <Button variant="ghost" size="sm" className="max-sm:size-9" onClick={onForward} aria-label={t('forward')}>
             <ForwardIcon />
             <span className="hidden sm:inline">{t('forward')}</span>
           </Button>
@@ -270,7 +271,7 @@ export function MailReader({
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" aria-label={t('more')}>
+            <Button variant="ghost" size="icon-sm" className="max-md:size-9" aria-label={t('more')}>
               <EllipsisVerticalIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -300,7 +301,7 @@ export function MailReader({
 
       {/* content */}
       <ScrollArea className="min-h-0 flex-1">
-        <article className="grid gap-5 p-4 md:p-6">
+        <article className="grid grid-cols-[minmax(0,1fr)] gap-5 p-4 md:p-6">
           <h2 className="text-xl leading-snug font-semibold break-words">{mail.subject || t('noSubject')}</h2>
           <div className="flex items-start gap-3">
             <SenderAvatar name={mail.senderName || mail.senderAddress} className="size-10" />
@@ -319,7 +320,7 @@ export function MailReader({
           </div>
           {extract && <AiExtractCard extract={extract} />}
           {mail.attachments.length > 0 && (
-            <div className="grid gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-2">
               <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <PaperclipIcon className="size-3.5" />
                 {t('attachments')} ({mail.attachments.length})
@@ -332,7 +333,7 @@ export function MailReader({
             </div>
           )}
           <Separator />
-          <MailBody key={mail.id} mail={mail} showText={showText} />
+          <MailBody key={mail.id} mail={mail} showText={showText} inPane />
         </article>
       </ScrollArea>
 

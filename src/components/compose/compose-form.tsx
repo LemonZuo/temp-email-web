@@ -89,16 +89,19 @@ const hasContent = (content: string, contentType: ContentType) => {
   return !!container.querySelector('img, audio, video, iframe, svg, canvas, table')
 }
 
+/** Label + fields. Fields wrap, so a `nameInput` drops onto its own line on phones instead of squeezing the address. */
 function Row({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('flex min-h-11 items-center gap-3 border-b px-4', className)}>
-      <span className="w-16 shrink-0 text-sm text-muted-foreground">{label}</span>
-      <div className="flex min-w-0 flex-1 items-center gap-2">{children}</div>
+    <div className={cn('flex min-h-11 items-start gap-3 border-b px-4', className)}>
+      <span className="flex h-11 w-16 shrink-0 items-center text-sm text-muted-foreground">{label}</span>
+      <div className="flex min-h-11 min-w-0 flex-1 flex-wrap items-center gap-x-2">{children}</div>
     </div>
   )
 }
 
 const bareInput = 'h-10 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 dark:bg-transparent'
+/** Optional display name next to an address: its own line on phones, a right-aligned 14rem field from `sm` */
+const nameInput = cn(bareInput, 'basis-full sm:basis-56 sm:text-right')
 
 /**
  * Mail composer bound to the shared session draft (so reply/forward can prefill it).
@@ -173,9 +176,9 @@ export function ComposeForm({
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-4xl flex-col">
           <Row label={t('from')}>
-            {fromSlot ?? <span className="truncate text-sm font-medium">{fromAddress}</span>}
+            {fromSlot ?? <span className="min-w-0 flex-1 py-2.5 text-sm font-medium break-all sm:truncate">{fromAddress}</span>}
             <Input
-              className={cn(bareInput, 'max-w-56 text-right text-sm')}
+              className={nameInput}
               value={draft.fromName}
               onChange={(e) => setDraft({ fromName: e.target.value })}
               placeholder={t('fromName')}
@@ -183,7 +186,7 @@ export function ComposeForm({
           </Row>
           <Row label={t('to')}>
             <Input
-              className={bareInput}
+              className={cn(bareInput, 'flex-1 basis-48')}
               type="email"
               value={draft.toMail}
               onChange={(e) => setDraft({ toMail: e.target.value })}
@@ -191,7 +194,7 @@ export function ComposeForm({
               autoComplete="email"
             />
             <Input
-              className={cn(bareInput, 'max-w-56 text-right text-sm')}
+              className={nameInput}
               value={draft.toName}
               onChange={(e) => setDraft({ toName: e.target.value })}
               placeholder={t('toName')}

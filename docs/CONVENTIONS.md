@@ -154,6 +154,9 @@ icon / icon-xs / icon-sm / icon-lg. Icons go first inside the button: `<Button><
   `DropdownMenu` (`EllipsisIcon` trigger) when there are more than two, pagination below.
 - Every destructive action asks `confirm(...)`. Every request shows a toast on error; writes show success toasts.
 - Must work on mobile (≥ 360px): wrap toolbars (`flex-wrap`), tables scroll horizontally, dialogs `sm:max-w-*`.
+  Grid layouts holding untrusted wide content (mail bodies) need `grid-cols-[minmax(0,1fr)]`, or the column grows to
+  the content and clips the page. Fields are forced to 16px below `md` (`index.css`, avoids iOS zoom on focus); the
+  main toolbar buttons use `max-md:size-9`.
 - Long JSON / config editors: `Textarea` with `font-mono text-xs`; validate with `JSON.parse` before saving and show
   the parse error inline (this is the only place a local try/catch around parsing is wanted).
 - Keep components typed; no `any` unless mirroring an untyped backend blob (then use `unknown` + narrow, or a local type).

@@ -16,7 +16,7 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={t('theme')}>
+        <Button variant="ghost" size="icon-sm" className="max-md:size-9" aria-label={t('theme')}>
           {resolvedTheme === 'dark' ? <MoonIcon /> : <SunIcon />}
         </Button>
       </DropdownMenuTrigger>
@@ -43,7 +43,7 @@ export function LanguageToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={t('language')}>
+        <Button variant="ghost" size="icon-sm" className="max-md:size-9" aria-label={t('language')}>
           <LanguagesIcon />
         </Button>
       </DropdownMenuTrigger>

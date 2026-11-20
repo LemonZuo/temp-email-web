@@ -136,6 +136,13 @@
 - 2026-11-20：新增 `.github/workflows/sync.yaml`（参考上游的 Upstream Sync）：只在 fork 中运行，每周一 00:00 UTC 或手动从 `berry-shake/temp-email-web` 同步 `main`；同步不复制标签、不触发部署。同步内容包含 workflow 改动时需在 fork 配置 `UPSTREAM_SYNC_TOKEN`（`repo` + `workflow` 权限）。说明见 `docs/DEPLOYMENT.md`「从 fork 部署」。
 - 2026-11-20：README 和部署文档改为中英分开两份（`README.md` / `README.en.md`，`docs/DEPLOYMENT.md` / `docs/DEPLOYMENT.en.md`，中文为主、顶部互链），并精简内容：路由与兼容说明并入部署文档「从旧前端迁移」，其他托管方式折叠显示，常见问题改为问答。
 - 2026-11-20：部署触发对齐上游：`deploy.yml` 增加 `workflow_run`（fork 中 Upstream Sync 成功后自动部署；源仓库和同步失败时跳过），保留 `v*` 标签和手动运行，推送 `main` 仍不部署。README 加「Deploy to Cloudflare」按钮（同上游，链接到部署文档；Cloudflare 真正的一键部署不支持构建变量 `VITE_API_BASE`，且复制出的仓库不是 fork、无法同步，故未采用）。
+- 2026-11-20：回滚 Cloudflare Pages 同源部署（`a5f29cd` 撤销 `badab81`），恢复 Worker 静态资源部署，构建时需要 `VITE_API_BASE`（已在 fork 的 Actions Variables 配置）。
+- 2026-11-20：移动端优化（360px 全量页面截图 + 溢出 / 点击区域 / 输入框字号检测）：
+  - 阅读页：HTML 邮件被裁切——`<article>` 的 grid 列被 600px 宽的邮件表格撑开，标题和正文一起超出屏幕。grid 改为 `grid-cols-[minmax(0,1fr)]`（收件箱与发件箱阅读区），正文容器可横向滚动；手机上正文去掉卡片边框、铺满屏幕宽度（`READER_MAIL_FRAME`）。
+  - 写信页：发件人 / 收件人名称在手机上换到单独一行（原来发件地址被挤成「t…」，后台发信的发件邮箱输入框只剩约 20px）；发件地址手机上换行显示完整，发信额度只显示数字。
+  - 小屏幕上所有输入框统一 16px（`index.css`），避免 iOS Safari 聚焦时放大页面。
+  - 手机上收件箱列表上方显示当前邮箱地址和复制按钮；顶栏、阅读页工具栏、列表工具栏按钮放大到 36px；落地页顶部「用户中心」「管理后台」只显示图标（优化清单第 1 项）。
+  - 管理后台隐藏入口：连点 logo 的提示改到屏幕底部（原来在手机上横跨顶部、盖住 logo，每两次点击只有一次算数）；logo 关闭双击缩放、点击区域扩大到 44px，并新增长按 0.7 秒直接进入。
 
 ## 下次继续（交接说明）
 

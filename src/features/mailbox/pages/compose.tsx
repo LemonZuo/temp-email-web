@@ -80,11 +80,13 @@ export default function ComposePage() {
   return (
     <ComposeForm
       fromSlot={
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="truncate font-mono text-sm font-medium">{address}</span>
-          <Badge variant="secondary" className="shrink-0 gap-1">
+        <div className="flex min-w-0 flex-1 items-center gap-2 py-2">
+          {/* phones: wrap the address instead of cutting it, and show the balance as a bare number */}
+          <span className="min-w-0 font-mono text-sm font-medium break-all sm:truncate">{address}</span>
+          <Badge variant="secondary" className="shrink-0 gap-1" title={t('balance', { n: send_balance })}>
             <CoinsIcon className="size-3" />
-            {t('balance', { n: send_balance })}
+            <span className="sm:hidden">{send_balance}</span>
+            <span className="hidden sm:inline">{t('balance', { n: send_balance })}</span>
           </Badge>
         </div>
       }

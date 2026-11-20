@@ -291,7 +291,7 @@ export function MailWorkspace({
             <span className="flex-1 truncate text-sm">{t('selected', { n: checked.size })}</span>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-sm" onClick={bulkDownload} aria-label={t('downloadSelected')}>
+                <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={bulkDownload} aria-label={t('downloadSelected')}>
                   <DownloadIcon />
                 </Button>
               </TooltipTrigger>
@@ -300,20 +300,20 @@ export function MailWorkspace({
             {deleteMail && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" onClick={bulkDelete} aria-label={t('deleteSelected')}>
+                  <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={bulkDelete} aria-label={t('deleteSelected')}>
                     <Trash2Icon className="text-destructive" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t('deleteSelected')}</TooltipContent>
               </Tooltip>
             )}
-            <Button variant="ghost" size="icon-sm" onClick={exitSelectMode} aria-label={t('cancel')}>
+            <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={exitSelectMode} aria-label={t('cancel')}>
               <XIcon />
             </Button>
           </>
         ) : (
           <>
-            <InputGroup className="h-8 flex-1">
+            <InputGroup className="h-8 flex-1 max-md:h-9">
               <InputGroupAddon>
                 <SearchIcon />
               </InputGroupAddon>
@@ -321,7 +321,7 @@ export function MailWorkspace({
             </InputGroup>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-sm" onClick={() => (page === 1 ? refetch() : setPage(1))} aria-label={t('refresh')}>
+                <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={() => (page === 1 ? refetch() : setPage(1))} aria-label={t('refresh')}>
                   <RefreshCwIcon className={cn(isFetching && 'animate-spin')} />
                 </Button>
               </TooltipTrigger>
@@ -329,7 +329,7 @@ export function MailWorkspace({
             </Tooltip>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon-sm" aria-label={t('more')} className="relative">
+                <Button variant="ghost" size="icon-sm" aria-label={t('more')} className="relative max-md:size-9">
                   <ListChecksIcon />
                   {autoRefresh && <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />}
                 </Button>

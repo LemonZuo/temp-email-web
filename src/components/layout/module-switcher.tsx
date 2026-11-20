@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { CheckIcon, ChevronsUpDownIcon, InboxIcon, ShieldIcon, UserRoundIcon, type LucideIcon } from 'lucide-react'
@@ -11,18 +11,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { adminPath } from '@/features/admin/paths'
+import { cn } from '@/lib/utils'
 import { useApp, useFlags } from '@/store/app'
 import { defineMessages, useT } from '@/i18n'
 
 export type ModuleKey = 'mailbox' | 'user' | 'admin' | 'other'
 
 const messages = defineMessages({
-  zh: { switchTo: '切换到', defaultTitle: '临时邮箱', other: '临时邮箱', tapsLeft: '再点击 {n} 次进入管理后台', toAdmin: '进入管理后台' },
+  zh: { switchTo: '切换到', defaultTitle: '临时邮箱', other: '临时邮箱', tapsLeft: '再点击 {n} 次或长按进入管理后台', toAdmin: '进入管理后台' },
   en: {
     switchTo: 'Switch to',
     defaultTitle: 'Temp Email',
     other: 'Temp Email',
-    tapsLeft: '{n} more taps to open the admin console',
+    tapsLeft: '{n} more taps, or press and hold, to open the admin console',
     toAdmin: 'Opening the admin console',
   },
 })
@@ -30,27 +31,63 @@ const messages = defineMessages({
 const ADMIN_TAPS = 5
 /** Taps further apart than this start a new count */
 const TAP_WINDOW_MS = 3000
+/** Holding the logo this long opens the console right away (five quick taps are hard on a phone) */
+const LONG_PRESS_MS = 700
 
 /**
- * Hidden admin entry kept from the old frontend: tapping the site logo 5 times opens the admin console,
- * which asks for the admin password when needed.
+ * Hidden admin entry: tapping the site logo 5 times (kept from the old frontend) or pressing and holding it opens
+ * the admin console, which asks for the admin password when needed. Returns the logo's event handlers.
  */
-function useAdminLogoTap() {
+// At the bottom: a top toast spans the phone screen and covers the logo (its close button sat right on it), so
+// every other tap hit the toast instead.
+const tapToast = { id: 'admin-logo-tap', duration: 1500, position: 'bottom-center' } as const
+
+function useAdminLogoGesture(isolate: boolean) {
   const t = useT(messages)
   const navigate = useNavigate()
   const taps = useRef({ count: 0, last: 0 })
-  return () => {
-    const now = Date.now()
-    const state = taps.current
-    state.count = now - state.last > TAP_WINDOW_MS ? 1 : state.count + 1
-    state.last = now
-    if (state.count >= ADMIN_TAPS) {
-      state.count = 0
-      toast(t('toAdmin'), { id: 'admin-logo-tap', duration: 1500 })
-      navigate(adminPath())
-    } else {
-      toast(t('tapsLeft', { n: ADMIN_TAPS - state.count }), { id: 'admin-logo-tap', duration: 1500 })
-    }
+  const pressTimer = useRef<number | undefined>(undefined)
+  /** The current press already opened the console; ignore the click that ends it */
+  const pressFired = useRef(false)
+  useEffect(() => () => window.clearTimeout(pressTimer.current), [])
+
+  const openConsole = () => {
+    taps.current.count = 0
+    toast(t('toAdmin'), tapToast)
+    navigate(adminPath())
+  }
+  const cancelPress = () => window.clearTimeout(pressTimer.current)
+
+  return {
+    onPointerDown: (e: React.PointerEvent) => {
+      // the module switcher opens its menu on pointerdown
+      if (isolate) e.stopPropagation()
+      if (e.button !== 0) return
+      pressFired.current = false
+      cancelPress()
+      pressTimer.current = window.setTimeout(() => {
+        pressFired.current = true
+        openConsole()
+      }, LONG_PRESS_MS)
+    },
+    onPointerUp: cancelPress,
+    onPointerLeave: cancelPress,
+    onPointerCancel: cancelPress,
+    // a long press would otherwise open the browser's context menu
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+    onClick: (e: React.MouseEvent) => {
+      if (isolate) e.stopPropagation()
+      if (pressFired.current) {
+        pressFired.current = false
+        return
+      }
+      const now = Date.now()
+      const state = taps.current
+      state.count = now - state.last > TAP_WINDOW_MS ? 1 : state.count + 1
+      state.last = now
+      if (state.count >= ADMIN_TAPS) openConsole()
+      else toast(t('tapsLeft', { n: ADMIN_TAPS - state.count }), tapToast)
+    },
   }
 }
 
@@ -65,19 +102,18 @@ export function Logo({
   /** Keep taps from reaching a parent control (e.g. the module switcher's dropdown trigger) */
   isolate?: boolean
 }) {
-  const onTap = useAdminLogoTap()
+  const gesture = useAdminLogoGesture(isolate)
   return (
     <div
-      className={`flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground select-none ${className}`}
-      onPointerDown={adminTap && isolate ? (e) => e.stopPropagation() : undefined}
-      onClick={
-        adminTap
-          ? (e) => {
-              if (isolate) e.stopPropagation()
-              onTap()
-            }
-          : undefined
-      }
+      className={cn(
+        'relative flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground select-none',
+        // touch-manipulation: quick taps must not be taken as double-tap zoom (iOS swallowed them);
+        // the invisible ::after grows a small logo to a 44px tap area (not inside the module switcher button)
+        adminTap && 'touch-manipulation [-webkit-touch-callout:none]',
+        adminTap && !isolate && "after:absolute after:-inset-2 after:content-['']",
+        className,
+      )}
+      {...(adminTap ? gesture : {})}
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-1/2" aria-hidden>
         <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z" />

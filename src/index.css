@@ -157,3 +157,15 @@
 .tiptap-content a { @apply text-primary underline underline-offset-2; }
 .tiptap-content img { @apply my-2 max-w-full rounded; }
 .tiptap-content hr { @apply my-4; }
+
+/*
+ * iOS Safari zooms the page when a field below 16px gets focus. On small screens every text field is 16px, including
+ * those that set their own size (`text-xs` JSON editors, tag inputs). Unlayered on purpose so it beats the utilities.
+ */
+@media (width < 48rem) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}

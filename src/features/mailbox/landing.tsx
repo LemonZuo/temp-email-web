@@ -111,18 +111,18 @@ export function MailboxLanding() {
           </div>
           <div className="flex items-center gap-1">
             {showUserSystem && !telegram && (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/user">
+              <Button variant="ghost" size="sm" className="max-sm:size-9" asChild>
+                <Link to="/user" aria-label={t('userCenter')}>
                   <UserRoundIcon />
-                  {t('userCenter')}
+                  <span className="hidden sm:inline">{t('userCenter')}</span>
                 </Link>
               </Button>
             )}
             {showAdminPage && !telegram && (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to={adminPath()}>
+              <Button variant="ghost" size="sm" className="max-sm:size-9" asChild>
+                <Link to={adminPath()} aria-label={t('admin')}>
                   <ShieldIcon />
-                  {t('admin')}
+                  <span className="hidden sm:inline">{t('admin')}</span>
                 </Link>
               </Button>
             )}

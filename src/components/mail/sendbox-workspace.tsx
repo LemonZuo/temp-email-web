@@ -20,7 +20,7 @@ import { parseSentMail, type ParsedSentMail, type RawSentMail } from '@/lib/send
 import { blockRemoteContent } from '@/lib/remote-content-policy'
 import { cn } from '@/lib/utils'
 import { usePrefs } from '@/store/prefs'
-import { MailHtml } from './mail-html'
+import { MailHtml, READER_MAIL_FRAME } from './mail-html'
 import { ThreePane } from './three-pane'
 import { defineMessages, useT } from '@/i18n'
 
@@ -82,27 +82,27 @@ function SentReader({
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex h-12 shrink-0 items-center gap-1 border-b px-2">
         {onBack && (
-          <Button variant="ghost" size="icon-sm" onClick={onBack} aria-label={t('back')}>
+          <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={onBack} aria-label={t('back')}>
             <ArrowLeftIcon />
           </Button>
         )}
         <div className="flex-1" />
         <Tooltip>
           <TooltipTrigger asChild>
-            <Toggle size="sm" pressed={raw} onPressedChange={setRaw} aria-label={t('showRaw')}>
+            <Toggle size="sm" className="max-md:size-9" pressed={raw} onPressedChange={setRaw} aria-label={t('showRaw')}>
               <Code2Icon />
             </Toggle>
           </TooltipTrigger>
           <TooltipContent>{t('showRaw')}</TooltipContent>
         </Tooltip>
         {onDelete && (
-          <Button variant="ghost" size="icon-sm" onClick={onDelete} aria-label={t('delete')}>
+          <Button variant="ghost" size="icon-sm" className="max-md:size-9" onClick={onDelete} aria-label={t('delete')}>
             <Trash2Icon className="text-destructive" />
           </Button>
         )}
       </div>
       <ScrollArea className="min-h-0 flex-1">
-        <article className="grid gap-4 p-4 md:p-6">
+        <article className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4 md:p-6">
           <h2 className="text-xl font-semibold break-words">{mail.subject || t('noSubject')}</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
             {showSender && (
@@ -120,7 +120,7 @@ function SentReader({
           {raw ? (
             <pre className="overflow-auto rounded-lg border bg-muted/40 p-3 font-mono text-xs whitespace-pre-wrap break-all">{mail.prettyRaw}</pre>
           ) : mail.isHtml ? (
-            <MailHtml html={html} className="border" />
+            <MailHtml html={html} className={READER_MAIL_FRAME} />
           ) : (
             <pre className="font-sans text-sm leading-relaxed whitespace-pre-wrap break-words">{mail.content}</pre>
           )}

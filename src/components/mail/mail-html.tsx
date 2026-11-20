@@ -56,5 +56,12 @@ export function MailHtml({ html, className }: { html: string; className?: string
     return () => host.removeEventListener('click', onClick)
   }, [])
 
-  return <div ref={hostRef} className={cn('rounded-lg bg-white p-4 text-left', className)} />
+  // overflow-x: content that cannot shrink (fixed min-width layouts) scrolls inside the card instead of being clipped
+  return <div ref={hostRef} className={cn('overflow-x-auto rounded-lg bg-white p-4 text-left', className)} />
 }
+
+/**
+ * Frame for a mail body in a reader pane: a bordered card, except on phones where it runs to the screen edges
+ * (cancelling the reader's `p-4`) so the mail gets the full width.
+ */
+export const READER_MAIL_FRAME = 'border max-md:-mx-4 max-md:rounded-none max-md:border-0'

@@ -239,7 +239,7 @@ export function AppShell({
       <SidebarInset className="min-h-0 overflow-hidden">
         <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
           {/* desktop uses the toggle at the bottom of the sidebar; on mobile this opens the sidebar sheet */}
-          <SidebarTrigger className="-ml-1 md:hidden" />
+          <SidebarTrigger className="-ml-1 size-9 md:hidden" />
           <Separator orientation="vertical" className="mr-1 data-vertical:h-4 data-vertical:self-center md:hidden" />
           <CurrentTitle groups={nav} />
           <div className="flex items-center gap-1">

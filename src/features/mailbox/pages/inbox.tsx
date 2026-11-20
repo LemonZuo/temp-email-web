@@ -4,7 +4,9 @@ import { SearchIcon, XIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
+import { CopyButton } from '@/components/common/copy-button'
 import { MailWorkspace } from '@/components/mail/mail-workspace'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { api, type ListResponse } from '@/lib/api'
 import { errorMessage } from '@/lib/format'
 import { buildForwardDraft, buildReplyDraft } from '@/lib/mail-actions'
@@ -34,9 +36,20 @@ const messages = defineMessages({
   },
 })
 
+/** Phones only: the sidebar (which shows the address on desktop) is hidden, so keep the address one tap from copying. */
+function CurrentAddressBar({ address }: { address: string }) {
+  return (
+    <div className="flex items-center gap-2 pl-1">
+      <span className="min-w-0 flex-1 font-mono text-sm font-medium break-all">{address}</span>
+      <CopyButton value={address} label variant="outline" size="sm" className="shrink-0" />
+    </div>
+  )
+}
+
 /** `/` — inbox of the current address. Supports `?mail_id=` to show a single mail. */
 export default function InboxPage() {
   const t = useT(messages)
+  const isMobile = useIsMobile()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const address = useApp((s) => s.addressSettings.address)
@@ -117,6 +130,8 @@ export default function InboxPage() {
               {t('showAll')}
             </Button>
           </form>
+        ) : isMobile ? (
+          <CurrentAddressBar address={address} />
         ) : undefined
       }
     />
