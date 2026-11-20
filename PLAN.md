@@ -132,6 +132,7 @@
 - 2026-11-20：邮件页（收件箱、用户中心、后台所有邮件 / 无收件人邮件）默认不再自动打开第一封，阅读区显示「选择一封邮件」；`?mail_id=` 链接仍自动打开那封邮件（手机端返回后不再重新打开）。
 - 2026-11-20：统计页日期选择弹层去掉 UTC 标签（页面说明里已注明按 UTC 日期统计）。
 - 2026-11-20：部署改为只在推送 `v*` tag 时触发：新增 GitHub Actions `.github/workflows/deploy.yml`（构建 + `wrangler deploy --tag`，也可在 Actions 页手动运行；缺少配置时直接报错）。需在 Cloudflare 断开 Worker 的 Git 自动构建，并在 GitHub 仓库配置 `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`（secrets）和 `VITE_API_BASE`（variable）。README 部署方式 C 已更新。
+- 2026-11-20：新增 `docs/DEPLOYMENT.md`（中英双语），详细说明 GitHub Actions 打标签发布、Cloudflare 关联仓库构建两种部署方式，以及部署后检查（`FRONTEND_URL`、Turnstile 域名、OAuth2 回调、Telegram 小程序）、从旧前端迁移、常见问题；README 改为中英双语并精简，部署部分指向该文档。
 
 ## 下次继续（交接说明）
 

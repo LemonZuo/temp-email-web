@@ -1,29 +1,66 @@
 # Temp Email Web
 
-A new frontend for [cloudflare_temp_email](https://github.com/dreamhunter2333/cloudflare_temp_email), built against the
-existing Worker API (no backend changes). It covers the mailbox, user center, admin console, redemption codes and the
-Telegram Mini App.
+A new frontend for [cloudflare_temp_email](https://github.com/dreamhunter2333/cloudflare_temp_email). It talks to the
+existing Worker API and needs no backend changes. It covers the mailbox, user center, admin console, redemption codes
+and the Telegram Mini App.
 
-**Stack:** Vite · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui · react-router · zustand · TanStack Query
+[cloudflare_temp_email](https://github.com/dreamhunter2333/cloudflare_temp_email) 的全新前端，直接对接现有的 Worker
+接口，后端无需任何改动。覆盖邮箱、用户中心、管理后台、兑换码和 Telegram 小程序。
 
-See [PLAN.md](./PLAN.md) for the task plan and status, and [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) for how pages
-are built.
+## Features / 功能
 
-**Upstream baseline:** rewritten from upstream commit
+- **Mailbox / 邮箱**: three-pane inbox with a resizable list and a reader that blocks remote images by default; sent
+  mail; compose in plain text, HTML or rich text; attachments, auto-reply, webhook and preferences.
+
+  三栏收件箱（列表宽度可拖动，阅读区默认拦截远程图片）、发件箱、写信（纯文本 / HTML / 富文本）、附件、自动回复、Webhook
+  和偏好设置。
+
+- **User center / 用户中心**: sign in with password, OAuth2 or passkey; manage bound mailboxes, read and send mail.
+
+  支持密码、OAuth2、通行密钥登录；管理绑定的邮箱，收信和发信。
+
+- **Admin console / 管理后台**: statistics, addresses, all mails and unknown-recipient mails, sent mail, users and roles,
+  OAuth2, webhook, Telegram, AI extraction, IP blacklist, redemption codes, database and maintenance.
+
+  统计、地址管理、所有邮件和无收件人邮件、发件记录、用户与角色、OAuth2、Webhook、Telegram、AI 提取、IP 黑名单、兑换码、
+  数据库与维护。
+
+- **Also / 其他**: redemption code page, Telegram Mini App, Chinese and English, light and dark themes, mobile layout.
+
+  兑换码页面、Telegram 小程序、中英文切换、明暗主题、移动端适配。
+
+**Stack / 技术栈:** Vite · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui · react-router · zustand ·
+TanStack Query
+
+## Upstream baseline / 上游基线
+
+Rewritten from upstream commit
 [`a40a6b0`](https://github.com/dreamhunter2333/cloudflare_temp_email/commit/a40a6b0dd8edaacd69c8d8ac71e0d3796650fff9)
-(v1.15.0). Synced upstream commits and how to sync are tracked in [docs/UPSTREAM.md](./docs/UPSTREAM.md).
+(backend v1.15.0). Synced upstream commits and how to sync are tracked in [docs/UPSTREAM.md](./docs/UPSTREAM.md).
 
-## Development
+基于上游提交 [`a40a6b0`](https://github.com/dreamhunter2333/cloudflare_temp_email/commit/a40a6b0dd8edaacd69c8d8ac71e0d3796650fff9)
+（后端 v1.15.0）重写。已同步的上游提交和同步方法见 [docs/UPSTREAM.md](./docs/UPSTREAM.md)。
+
+## Development / 本地开发
+
+Requires Node 22 (`.node-version`) and pnpm 11 (`packageManager` in `package.json`; run `corepack enable` to use it).
+
+需要 Node 22（见 `.node-version`）和 pnpm 11（见 `package.json` 的 `packageManager`，执行 `corepack enable` 后自动使用该版本）。
 
 ```bash
 pnpm install
-# Point the dev server at a running worker (proxies /api/, /open_api/, /user_api/, /admin/ ...)
+# Proxy backend paths (/api/, /open_api/, /user_api/, /admin/ ...) to a running worker
+# 把后端路径代理到一个运行中的 Worker
 DEV_PROXY_TARGET=http://127.0.0.1:8787 pnpm dev
 ```
 
-Or set `VITE_API_BASE` to the worker URL to call it directly (the worker allows CORS).
+Alternatively, set `VITE_API_BASE` to a worker URL and call it directly; the worker allows CORS.
 
-A local worker can be started from the backend repo's e2e setup:
+也可以把 `VITE_API_BASE` 设为 Worker 地址直接请求，后端已开放 CORS。
+
+A local worker can be started from the backend repository's e2e setup:
+
+本地 Worker 可以用后端仓库的 e2e 环境启动：
 
 ```bash
 cd ../cloudflare_temp_email/e2e
@@ -32,110 +69,89 @@ curl -X POST http://localhost:8787/admin/db_initialize
 curl -X POST http://localhost:8787/admin/db_migration
 ```
 
-Checks: `npx tsc -p tsconfig.app.json --noEmit` and `pnpm lint`.
+Checks / 检查: `npx tsc -p tsconfig.app.json --noEmit` and / 和 `pnpm lint`.
 
-## Build
+## Build and configuration / 构建与配置
 
 ```bash
-pnpm build            # outputs dist/
-pnpm build:telegram   # Telegram Mini App build (loads telegram-web-app.js first)
+pnpm build            # outputs dist/ / 输出到 dist/
+pnpm build:telegram   # Telegram Mini App build / Telegram 小程序构建
 ```
 
-### Configuration
+| Build-time env / 构建变量 | Runtime key / 运行时键（`#app-config`） | Meaning / 含义 |
+|---|---|---|
+| `VITE_API_BASE` | `API_BASE` | Backend Worker URL; empty means same origin<br>后端 Worker 地址，留空表示同源 |
+| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | `zh` or `en`; takes priority over the browser language until the user picks one<br>`zh` 或 `en`，用户手动切换前优先于浏览器语言 |
+| `VITE_IS_TELEGRAM` | `IS_TELEGRAM` | Telegram Mini App mode (set by `build:telegram`)<br>Telegram 小程序模式（`build:telegram` 会自动设置） |
 
-| Build-time env | Runtime key (`#app-config`) | Meaning |
-|----------------|-----------------------------|---------|
-| `VITE_API_BASE` | `API_BASE` | Worker URL. Empty = same origin (Pages middleware / Worker assets) |
-| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | Default language (`zh` / `en`), used before the browser language until the user picks one |
-| `VITE_IS_TELEGRAM` | `IS_TELEGRAM` | Telegram Mini App mode |
-
-Runtime values let one build point at different workers: edit the tag in `dist/index.html`, e.g.
+Runtime keys let one build point at different workers: edit the tag in `dist/index.html`, e.g.
 `<script id="app-config" type="application/json">{"API_BASE":"https://mail-api.example.com"}</script>`.
+Everything else (site title, domains, announcement, feature switches ...) comes from the backend's
+`/open_api/settings`, as with the old frontend.
 
-Everything else (site title, domains, announcement, feature switches ...) comes from the worker's
-`/open_api/settings`, exactly like the old frontend.
+运行时键可以让同一份构建指向不同的后端：修改 `dist/index.html` 里的这个标签即可，例如上面的写法。其他配置（站点标题、
+邮箱域名、公告、功能开关等）都和旧前端一样，来自后端的 `/open_api/settings`。
 
-## Deployment
+## Deployment / 部署
 
-The frontend is a static SPA in `dist/`. Pick one of the following.
+The site is deployed as a Cloudflare Worker with static assets (`wrangler.jsonc`). Choose **one** of the two methods;
+[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) has the full steps, post-deployment checklist, migration notes and
+troubleshooting.
 
-### A. Cloudflare Pages + same-origin API (recommended)
+站点以 Cloudflare Worker 静态资源的形式部署（`wrangler.jsonc`）。以下两种方式**二选一**，完整步骤、部署后检查、迁移注意事项和常见问题见
+[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)。
 
-`pages/` contains a Pages project whose middleware forwards backend paths to the worker through a service binding,
-the same setup as the old `cloudflare_temp_email/pages`. Set `service` in `pages/wrangler.toml` to your worker's
-name, then:
+| Method / 方式 | Deploys when / 何时部署 | Configure in / 配置位置 |
+|---|---|---|
+| A. GitHub Actions (current / 当前) | A `v*` tag is pushed, or a manual run<br>推送 `v*` 标签或手动运行 | GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; variable `VITE_API_BASE` |
+| B. Cloudflare Workers Builds | Every push to `main`<br>每次推送到 `main` | Worker → *Settings* → *Build*; build variable `VITE_API_BASE` |
+
+Release with method A / 用方式 A 发布：
 
 ```bash
-pnpm build
-cd pages && npx wrangler pages deploy --branch production
+npm version 0.2.0 --no-git-tag-version
+git commit -am "chore: release v0.2.0"
+git tag v0.2.0
+git push origin main v0.2.0
 ```
 
-Pages serves `index.html` for unknown paths, so client-side routes work on reload.
+Deploying from a local machine / 本地直接部署: `VITE_API_BASE=https://mail-api.example.com pnpm run deploy`.
 
-### B. Served by the worker (assets)
+## Routes / 路由
 
-In the worker's `wrangler.toml`:
-
-```toml
-[assets]
-directory = "../../temp-email-web/dist/"   # path to this repo's dist
-binding = "ASSETS"
-run_worker_first = true
-```
-
-The worker returns `index.html` for every non-API path without a file extension.
-
-### C. Cloudflare Workers (static assets)
-
-`wrangler.jsonc` deploys `dist/` as a Worker named `temp-email-web` with static assets and an SPA fallback. The API
-is called cross-origin (the worker allows CORS), so `VITE_API_BASE` must be set at build time.
-
-**Release on tags (current setup).** `.github/workflows/deploy.yml` builds and deploys only when a `v*` tag is pushed
-(or when run manually from the Actions tab):
-
-1. Cloudflare: if the Worker was created with *Continue with GitHub*, disconnect it under
-   **Worker → Settings → Build**, otherwise every push to `main` still deploys.
-2. GitHub → repository **Settings → Secrets and variables → Actions**:
-   - secrets `CLOUDFLARE_API_TOKEN` (API token from the *Edit Cloudflare Workers* template) and `CLOUDFLARE_ACCOUNT_ID`
-   - variable `VITE_API_BASE` = `https://<your worker domain>`
-3. Release:
-
-   ```bash
-   git tag v0.2.0
-   git push origin v0.2.0
-   ```
-
-The git tag is recorded on the Cloudflare Worker version (`wrangler deploy --tag`), so a deployment can be traced
-back to its tag; rolling back is done from **Worker → Deployments**.
-
-**Deploy on every push (Workers Builds).** Alternatively keep the dashboard flow **Workers & Pages → Create
-application → Continue with GitHub** with build command `pnpm run build`, deploy command `npx wrangler deploy` and
-the build variable `VITE_API_BASE`.
-
-Locally: `VITE_API_BASE=... pnpm run deploy`.
-
-### D. Separate origin
-
-Deploy `dist/` to any static host with an SPA fallback (all unknown paths → `index.html`) and set `API_BASE`
-(build-time or runtime) to the worker URL.
-
-### Routes
-
-| Path | Module |
-|------|--------|
-| `/` | Mailbox (inbox, `/sent`, `/compose`, `/settings`, `/auto-reply`, `/webhook`, `/attachments`, `/preferences`, `/about`) |
-| `/user/*` | User center (`/user/oauth2/callback` is kept for OAuth2 providers) |
-| `/console/*` | Admin console — `/admin` redirects here |
-| `/redeem` | Redemption codes |
-| `/telegram_mail` | Telegram Mini App mail view |
+| Path / 路径 | Module / 模块 |
+|---|---|
+| `/` | Mailbox / 邮箱（`/sent`, `/compose`, `/settings`, `/auto-reply`, `/webhook`, `/attachments`, `/preferences`, `/about`） |
+| `/user/*` | User center / 用户中心（`/user/oauth2/callback` is the OAuth2 redirect URL / 是 OAuth2 回调地址） |
+| `/console/*` | Admin console / 管理后台（`/admin` redirects here / 会跳转到这里） |
+| `/redeem` | Redemption codes / 兑换码 |
+| `/telegram_mail` | Telegram Mini App mail view / Telegram 小程序邮件页 |
 
 Frontend routes never start with a backend prefix (`/api/`, `/open_api/`, `/user_api/`, `/admin/`, `/telegram/`,
-`/external/`, `/redeem_api/`). The middleware and the worker forward those to the API, so the admin console cannot
-live under `/admin/...`.
+`/external/`, `/redeem_api/`), because proxies and the backend forward those paths to the API. That is why the admin
+console lives at `/console` rather than `/admin/...`.
 
-### Compatibility with the old frontend
+前端路由不能以后端前缀开头（`/api/`、`/open_api/`、`/user_api/`、`/admin/`、`/telegram/`、`/external/`、`/redeem_api/`），
+因为代理和后端会把这些路径转发给接口。所以管理后台放在 `/console`，而不是 `/admin/...`。
+
+## Compatibility with the old frontend / 与旧前端的兼容
 
 - Same browser storage keys (`jwt`, `userJwt`, `adminAuth`, `auth`, `LocalAddressCache`, session `addressPassword`):
-  switching frontends keeps users signed in.
-- `?jwt=` auto-login links, `?mail_id=` links (used by `FRONTEND_URL` in notifications), and legacy `/zh/...`,
-  `/en/...` URLs keep working.
+  deployed on the old frontend's domain, users stay signed in.
+
+  沿用相同的浏览器存储键名（`jwt`、`userJwt`、`adminAuth`、`auth`、`LocalAddressCache`、会话中的 `addressPassword`），
+  部署在旧前端的域名上时用户无需重新登录。
+
+- `?jwt=` auto-login links, `?mail_id=` links (built from the backend's `FRONTEND_URL`), and legacy `/zh/...`, `/en/...`
+  URLs keep working.
+
+  `?jwt=` 自动登录链接、`?mail_id=` 链接（由后端的 `FRONTEND_URL` 生成）以及旧的 `/zh/...`、`/en/...` 地址继续可用。
+
+## Documentation / 文档
+
+| File / 文件 | Content / 内容 |
+|---|---|
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Deployment / 部署 |
+| [docs/UPSTREAM.md](./docs/UPSTREAM.md) | Upstream baseline and sync log / 上游基线与同步记录 |
+| [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) | How pages are built / 页面开发约定 |
+| [PLAN.md](./PLAN.md) | Task plan and change log / 任务计划与变更记录 |

@@ -1,5 +1,5 @@
-// Deploys dist/ as a Worker with static assets. Released by .github/workflows/deploy.yml when a `v*` tag is pushed
-// (see README → Deployment C). VITE_API_BASE must be set at build time.
+// Deploys dist/ as a Worker with static assets, either by .github/workflows/deploy.yml on `v*` tags or by Cloudflare
+// Workers Builds (see docs/DEPLOYMENT.md). VITE_API_BASE must be set at build time.
 {
   "name": "temp-email-web",
   "compatibility_date": "2026-11-01",
