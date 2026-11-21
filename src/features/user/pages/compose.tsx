@@ -143,7 +143,7 @@ export default function ComposePage() {
             </Button>
           </EmptyState>
         ) : (
-          <div className="mx-auto grid w-full max-w-4xl gap-3 p-4">
+          <div className="mx-auto grid w-full max-w-7xl gap-3 p-4">
             <Skeleton className="h-9 w-full" />
             <Skeleton className="h-9 w-full" />
             <Skeleton className="h-72 w-full" />

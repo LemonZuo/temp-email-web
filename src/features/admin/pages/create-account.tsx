@@ -323,7 +323,8 @@ export default function CreateAccountPage() {
   const progressPercent = batchRequested ? Math.floor((batchCompleted / batchRequested) * 100) : 0
 
   return (
-    <Page>
+    // a short form: a narrow column reads better than the 1280px settings width
+    <Page className="max-w-3xl">
       <PageHeader
         title={t('title')}
         description={t('description')}
@@ -338,7 +339,7 @@ export default function CreateAccountPage() {
       />
 
       <Tabs value={mode} onValueChange={(v) => !busy && setMode(v as typeof mode)}>
-        <TabsList className="w-full sm:w-auto" aria-label={t('creationMode')}>
+        <TabsList className="w-full sm:w-fit" aria-label={t('creationMode')}>
           <TabsTrigger value="single" disabled={busy && mode !== 'single'}>
             <UserPlusIcon />
             {t('singleMode')}

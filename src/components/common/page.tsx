@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 /**
  * Standard scrollable page used inside the app shell for non-mail screens
  * (settings, admin tables...). Mail screens use the three-pane workspace instead.
- * `wide` pages (tables, charts) fill the content area; others stay a centered readable column.
+ * `wide` pages (tables, charts) fill the content area; others stay a centered column of at most 1280px
+ * (`max-w-7xl`): it fills laptop screens and keeps single-column forms readable on wide monitors.
  */
 export function Page({ className, children, wide }: { className?: string; children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="h-full min-h-0 overflow-y-auto">
-      <div className={cn('mx-auto flex w-full flex-col gap-6 p-4 md:p-6', !wide && 'max-w-4xl', className)}>
+      <div className={cn('mx-auto flex w-full flex-col gap-6 p-4 md:p-6', !wide && 'max-w-7xl', className)}>
         {children}
       </div>
     </div>
