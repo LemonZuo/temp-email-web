@@ -38,7 +38,6 @@ const messages = defineMessages({
   zh: {
     title: '邮箱设置',
     description: '地址屏蔽规则、发信限制、地址创建规则与邮件转发规则。',
-    successTip: '保存成功',
     blockingSection: '屏蔽与收信',
     blockingSectionDesc: '限制可创建的地址与可接收的发件人。',
     sendingSection: '发信',
@@ -112,7 +111,6 @@ const messages = defineMessages({
   en: {
     title: 'Mailbox settings',
     description: 'Address block rules, sending limits, address creation rules and mail forwarding rules.',
-    successTip: 'Save Success',
     blockingSection: 'Blocking & receiving',
     blockingSectionDesc: 'Restrict which addresses can be created and which senders are accepted.',
     sendingSection: 'Sending',
@@ -381,7 +379,7 @@ export default function AccountSettingsPage() {
           monthlyLimit: draft.monthlyEnabled ? draft.monthlyLimit : null,
         },
       })
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       setShowErrors(false)
       // keep `saving` until the fresh settings are in, so the form can't be re-submitted meanwhile
       const refreshed = await settings.refetch()

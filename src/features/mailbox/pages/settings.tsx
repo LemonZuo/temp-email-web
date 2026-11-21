@@ -181,7 +181,7 @@ export default function AddressSettingsPage() {
     if (!(await confirm({ title, description: t('irreversible'), destructive, confirmText: t('clear') }))) return
     try {
       await api.delete(path)
-      toast.success(t('success'))
+      toast.success(t('cleared'))
       queryClient.invalidateQueries({ queryKey: ['mailbox'] })
     } catch (error) {
       toast.error(errorMessage(error))
@@ -201,7 +201,7 @@ export default function AddressSettingsPage() {
       const { jwt, localAddressCache, setLocalAddressCache } = useAuth.getState()
       setLocalAddressCache(localAddressCache.filter((x) => x !== jwt))
       leaveAddress()
-      toast.success(t('success'))
+      toast.success(t('deleted'))
       navigate('/')
     } catch (error) {
       toast.error(errorMessage(error))

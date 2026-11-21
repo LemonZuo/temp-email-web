@@ -214,7 +214,7 @@ function ChangeRoleDialog({
     setLoading(true)
     try {
       await api.post('/admin/user_roles', { user_id: user.id, role_text: role })
-      toast.success(t('success'))
+      toast.success(t('saved'))
       onOpenChange(false)
       onSaved()
     } catch (error) {
@@ -316,11 +316,11 @@ export default function UsersPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', 'users', 'list'] })
 
   const deleteUser = async (row: UserRow) => {
-    if (!(await confirm({ title: t('deleteUserTip'), description: t('deleteUserDesc', { email: row.user_email }), destructive: true })))
+    if (!(await confirm({ title: t('deleteUserTip'), description: t('deleteUserDesc', { email: row.user_email }), destructive: true, confirmText: t('deleteUser') })))
       return
     try {
       await api.delete(`/admin/users/${row.id}`)
-      toast.success(t('success'))
+      toast.success(t('deleted'))
       await refresh()
     } catch (error) {
       toast.error(errorMessage(error))

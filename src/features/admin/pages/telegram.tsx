@@ -25,6 +25,7 @@ const messages = defineMessages({
     description: '配置 Telegram Bot 的访问控制、全局邮件推送和电报小程序。',
     status: '查看状态',
     init: '初始化',
+    statusErrorTip: '请检查 Worker 的 TELEGRAM_BOT_TOKEN 是否正确；Token 无误时可先点「初始化」。',
     initDesc: '将机器人 Webhook 指向当前 Worker 并注册命令。',
     successTip: '成功',
     enable: '启用',
@@ -62,6 +63,7 @@ const messages = defineMessages({
     description: 'Access control, global mail push and the Telegram mini app for your bot.',
     status: 'Check Status',
     init: 'Init',
+    statusErrorTip: 'Check that TELEGRAM_BOT_TOKEN is set correctly on the worker; with a valid token, run Init first.',
     initDesc: 'Point the bot webhook to this worker and register the commands.',
     successTip: 'Success',
     enable: 'Enable',
@@ -145,7 +147,8 @@ export default function TelegramPage() {
     try {
       setStatus(await api.get<TelegramStatus>('/admin/telegram/status'))
     } catch (error) {
-      toast.error(errorMessage(error))
+      // Telegram's own error (e.g. "Error 404: Not Found" for a bad token) means little on its own
+      toast.error(errorMessage(error), { description: t('statusErrorTip') })
     } finally {
       setStatusLoading(false)
     }
@@ -229,7 +232,7 @@ function TelegramSettingsForm({
     try {
       await api.post('/admin/telegram/settings', settings)
       queryClient.setQueryData(QUERY_KEY, settings)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

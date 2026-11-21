@@ -238,11 +238,18 @@ export default function AccountsPage() {
     }
   }
 
-  const runSingle = async (options: { title: string; description: string; request: () => Promise<unknown> }) => {
-    if (!(await confirm({ title: options.title, description: options.description, destructive: true }))) return
+  const runSingle = async (options: {
+    title: string
+    description: string
+    confirmText: string
+    successText: string
+    request: () => Promise<unknown>
+  }) => {
+    if (!(await confirm({ title: options.title, description: options.description, destructive: true, confirmText: options.confirmText })))
+      return
     try {
       await options.request()
-      toast.success(t('success'))
+      toast.success(options.successText)
       await refresh()
     } catch (error) {
       toast.error(errorMessage(error))
@@ -253,18 +260,24 @@ export default function AccountsPage() {
     runSingle({
       title: t('deleteTip'),
       description: t('deleteDesc', { address: row.name }),
+      confirmText: t('delete'),
+      successText: t('deleted'),
       request: () => api.delete(`/admin/delete_address/${row.id}`),
     })
   const clearInbox = (row: AddressRow) =>
     runSingle({
       title: t('clearInboxTip'),
       description: row.name,
+      confirmText: t('clearInbox'),
+      successText: t('cleared'),
       request: () => api.delete(`/admin/clear_inbox/${row.id}`),
     })
   const clearSent = (row: AddressRow) =>
     runSingle({
       title: t('clearSentItemsTip'),
       description: row.name,
+      confirmText: t('clearSentItems'),
+      successText: t('cleared'),
       request: () => api.delete(`/admin/clear_sent_items/${row.id}`),
     })
 
@@ -277,7 +290,7 @@ export default function AccountsPage() {
   }) => {
     const rows = selectedRows
     if (rows.length === 0) return toast.error(t('pleaseSelectAddress'))
-    if (!(await confirm({ title: options.confirmTitle, description: t('multiTip', { n: rows.length }), destructive: true })))
+    if (!(await confirm({ title: options.confirmTitle, description: t('multiTip', { n: rows.length }), destructive: true, confirmText: options.title })))
       return
     const failed: number[] = []
     setProgress({ title: options.title, done: 0, total: rows.length, failed: 0, running: true })

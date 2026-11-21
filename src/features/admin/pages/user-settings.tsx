@@ -17,7 +17,6 @@ const messages = defineMessages({
   zh: {
     title: '用户设置',
     description: '用户注册、邮箱验证与地址绑定数量。',
-    successTip: '保存成功',
     registerSection: '注册',
     registerSectionDesc: '控制谁可以注册用户账号。',
     bindingSection: '地址绑定',
@@ -40,7 +39,6 @@ const messages = defineMessages({
   en: {
     title: 'User settings',
     description: 'User registration, mail verification and address binding limits.',
-    successTip: 'Save Success',
     registerSection: 'Registration',
     registerSectionDesc: 'Control who can register a user account.',
     bindingSection: 'Address binding',
@@ -124,7 +122,7 @@ export default function UserSettingsPage() {
     setSaving(true)
     try {
       await api.post('/admin/user_settings', draft)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       await settings.refetch()
     } catch (error) {
       toast.error(errorMessage(error))

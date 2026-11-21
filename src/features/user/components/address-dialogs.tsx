@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { ArrowRightLeftIcon, InfoIcon, LogInIcon, MailPlusIcon, TicketIcon } from 'lucide-react'
+import { ArrowRightLeftIcon, LogInIcon, MailPlusIcon, TicketIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -20,9 +19,9 @@ const messages = defineMessages({
   zh: {
     addTitle: '添加邮箱',
     addDesc: '创建新邮箱地址或登录已有邮箱，都会自动绑定到当前用户。',
+    addDescBindOnly: '登录已有邮箱后，它会自动绑定到当前用户。',
     createTab: '创建邮箱',
     bindTab: '绑定已有邮箱',
-    bindUserInfo: '已登录用户, 登录未绑定邮箱或创建新邮箱地址将绑定到当前用户',
     bindUserAddressError: '绑定邮箱地址到用户时出错',
     redeemEntryTip: '使用兑换码可解锁高级权限',
     useRedeemCode: '使用兑换码',
@@ -37,9 +36,9 @@ const messages = defineMessages({
   en: {
     addTitle: 'Add Mailbox',
     addDesc: 'Create a new address or sign in to an existing one; either way it is bound to your account.',
+    addDescBindOnly: 'Sign in to an existing address to bind it to your account.',
     createTab: 'Create address',
     bindTab: 'Bind existing',
-    bindUserInfo: 'Logged in user, login without binding email or create new email address will bind to current user',
     bindUserAddressError: 'Failed to bind address to user',
     redeemEntryTip: 'Use a redemption code to unlock advanced access.',
     useRedeemCode: 'Use redemption code',
@@ -83,7 +82,7 @@ export function AddAddressDialog({
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t('addTitle')}</DialogTitle>
-          <DialogDescription>{t('addDesc')}</DialogDescription>
+          <DialogDescription>{t(canCreate ? 'addDesc' : 'addDescBindOnly')}</DialogDescription>
         </DialogHeader>
         <Tabs value={active} onValueChange={(v) => onTabChange(v as AddTab)}>
           {canCreate && (
@@ -98,10 +97,6 @@ export function AddAddressDialog({
               </TabsTrigger>
             </TabsList>
           )}
-          <Alert className="mt-3">
-            <InfoIcon />
-            <AlertDescription>{t('bindUserInfo')}</AlertDescription>
-          </Alert>
           {canCreate && (
             <TabsContent value="create" className="pt-3">
               <CreateAddressForm showCredential={false} afterCreated={(res) => onCreated(res)} />

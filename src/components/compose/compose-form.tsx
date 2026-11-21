@@ -132,7 +132,7 @@ export function ComposeForm({
   store?: ComposeStore
 }) {
   const t = useT(messages)
-  const { draft, revision, setDraft, reset } = store()
+  const { draft, revision, setDraft, replaceDraft, reset } = store()
   const autoLoad = usePrefs((s) => s.autoLoadRemoteImages)
   const [preview, setPreview] = useState(false)
   const [sending, setSending] = useState(false)
@@ -253,9 +253,11 @@ export function ComposeForm({
           variant="ghost"
           size="sm"
           onClick={() => {
+            // discarding is one click away from the send button: offer an undo instead of a confirm dialog
+            const previous = draft
             reset()
             setPreview(false)
-            toast(t('discardConfirm'))
+            toast(t('discardConfirm'), { id: 'compose-discard', action: { label: t('undo'), onClick: () => replaceDraft(previous) } })
           }}
         >
           <Trash2Icon />

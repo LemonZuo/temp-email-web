@@ -13,13 +13,13 @@ const messages = defineMessages({
     adminComposeTip: '以管理员身份使用已配置的邮箱地址发信，不检查发信额度。草稿保存在当前浏览器会话中。',
     senderAddress: '发件邮箱',
     fromMailEmpty: '发件人地址不能为空',
-    successSend: '请查看您的发件箱, 如果失败, 请检查稍后重试。',
+    successSend: '请到发件箱查看，如果发送失败，请检查发信配置或稍后重试。',
   },
   en: {
     adminComposeTip: 'Send as admin from a configured email address; send balance is not checked. The draft stays in this browser session.',
     senderAddress: 'Sender address',
     fromMailEmpty: 'Sender address is empty',
-    successSend: 'Please check your sendbox. If failed, please try again later.',
+    successSend: 'Check the sendbox. If it failed, check the send configuration or try again later.',
   },
 })
 

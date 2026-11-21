@@ -152,7 +152,10 @@ icon / icon-xs / icon-sm / icon-lg. Icons go first inside the button: `<Button><
 - Page = `Page` → `PageHeader` (title, short description, primary actions on the right) → `Section` cards / table.
 - Tables: toolbar row above (search input with `SearchIcon` in an `InputGroup`, filters, refresh), row actions in a
   `DropdownMenu` (`EllipsisIcon` trigger) when there are more than two, pagination below.
-- Every destructive action asks `confirm(...)`. Every request shows a toast on error; writes show success toasts.
+- Every destructive action asks `confirm(...)` with a `confirmText` naming the action (删除 / 清空 / 解绑 / 删除用户 …), never the
+  generic 确认. A quick reversible action (discarding a draft) offers an undo in its toast instead of a confirm.
+- Every request shows a toast on error; writes show success toasts that say what happened: `t('saved')`, `t('deleted')`,
+  `t('cleared')` from `common.ts` rather than a bare 成功 / 操作成功.
 - Must work on mobile (≥ 360px): wrap toolbars (`flex-wrap`), tables scroll horizontally, dialogs `sm:max-w-*`.
   Grid layouts holding untrusted wide content (mail bodies) need `grid-cols-[minmax(0,1fr)]`, or the column grows to
   the content and clips the page. Fields are forced to 16px below `md` (`index.css`, avoids iOS zoom on focus); the

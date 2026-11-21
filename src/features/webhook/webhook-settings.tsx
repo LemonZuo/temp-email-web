@@ -55,7 +55,7 @@ const messages = defineMessages({
     specifiedMail: '指定 ID',
     mailId: '邮件 ID',
     invalidMailId: '请输入有效的正整数邮件 ID',
-    fillInDemoTip: '请修改URL和其他设置为您自己的配置',
+    fillInDemoTip: '已填入示例，请把 URL 等设置改成你自己的配置',
     notEnabled: 'Webhook 未开启，请联系管理员开启',
     presets: '示例模板',
     successTip: '成功',
@@ -99,7 +99,7 @@ const messages = defineMessages({
     specifiedMail: 'Specify ID',
     mailId: 'Email ID',
     invalidMailId: 'Enter a valid positive integer email ID',
-    fillInDemoTip: 'Please modify the URL and other settings to your own',
+    fillInDemoTip: 'Example filled in. Replace the URL and other settings with your own.',
     notEnabled: 'Webhook is not enabled for you',
     presets: 'Presets',
     successTip: 'Success',
@@ -354,7 +354,7 @@ function WebhookForm({
       setSaved(payload)
       setSettings(payload)
       queryClient.setQueryData(queryKey, payload)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

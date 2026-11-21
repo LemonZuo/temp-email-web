@@ -313,7 +313,7 @@ export default function CreateAccountPage() {
 
   const clearBatch = async () => {
     if (batchRunning) return
-    if (!(await confirm({ title: t('clearResultsConfirm'), description: t('clearResultsDesc'), destructive: true }))) return
+    if (!(await confirm({ title: t('clearResultsConfirm'), description: t('clearResultsDesc'), destructive: true, confirmText: t('clearResults') }))) return
     setBatchRows([])
     setBatchCompleted(0)
     setBatchRequested(0)

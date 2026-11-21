@@ -107,7 +107,7 @@ function EditSenderDialog({
         balance: parsed,
         enabled: enabled ? 1 : 0,
       })
-      toast.success(t('success'))
+      toast.success(t('saved'))
       onOpenChange(false)
       onSaved()
     } catch (error) {
@@ -183,11 +183,11 @@ export default function SenderAccessPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', 'sender-access'] })
 
   const remove = async (row: SenderRow) => {
-    if (!(await confirm({ title: t('deleteTip'), description: t('deleteDesc', { address: row.address }), destructive: true })))
+    if (!(await confirm({ title: t('deleteTip'), description: t('deleteDesc', { address: row.address }), destructive: true, confirmText: t('delete') })))
       return
     try {
       await api.delete(`/admin/address_sender/${row.id}`)
-      toast.success(t('success'))
+      toast.success(t('deleted'))
       await refresh()
     } catch (error) {
       toast.error(errorMessage(error))

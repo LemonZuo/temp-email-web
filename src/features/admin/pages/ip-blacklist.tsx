@@ -19,7 +19,6 @@ const messages = defineMessages({
   zh: {
     title: 'IP 黑名单设置',
     description: '限制可访问限流 API 的 IP、运营商与浏览器指纹。',
-    successTip: '保存成功',
     tip_scope: '作用范围：创建邮箱地址、发送邮件、外部发送邮件 API、用户注册、验证码验证',
     whitelistSection: 'IP 白名单',
     blacklistSection: '黑名单',
@@ -55,7 +54,6 @@ const messages = defineMessages({
   en: {
     title: 'IP Blacklist Settings',
     description: 'Restrict which IPs, providers and browser fingerprints can access rate-limited APIs.',
-    successTip: 'Save Success',
     tip_scope: 'Applies to: Create Address, Send Mail, External Send Mail API, User Registration, Verify Code',
     whitelistSection: 'IP whitelist',
     blacklistSection: 'Blacklists',
@@ -152,7 +150,7 @@ export default function IpBlacklistPage() {
         enableDailyLimit: draft.enableDailyLimit,
         dailyRequestLimit: draft.dailyRequestLimit,
       })
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       await settings.refetch()
     } catch (error) {
       toast.error(errorMessage(error))

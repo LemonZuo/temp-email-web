@@ -154,10 +154,10 @@ export function SendboxWorkspace({ queryKey, fetchMails, deleteMail, showSender,
   const onDelete =
     deleteMail && selected
       ? async () => {
-          if (!(await confirm({ title: t('deleteConfirm'), description: selected.subject, destructive: true }))) return
+          if (!(await confirm({ title: t('deleteConfirm'), description: selected.subject, destructive: true, confirmText: t('delete') }))) return
           try {
             await deleteMail(selected.id)
-            toast.success(t('success'))
+            toast.success(t('deleted'))
             setSelectedId(null)
             await paged.refetch()
           } catch (error) {

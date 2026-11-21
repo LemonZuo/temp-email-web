@@ -225,7 +225,7 @@ export function MailWorkspace({
         if (!selected) return
         try {
           await deleteMail(selected.id)
-          toast.success(t('success'))
+          toast.success(t('deleted', { n: 1 }))
           setSelectedId(goNext ? filtered[selectedIndex + 1].id : null)
           await refetch()
         } catch (error) {
@@ -238,7 +238,7 @@ export function MailWorkspace({
     if (!deleteMail) return
     const ids = [...checked]
     if (ids.length === 0) return toast.error(t('pleaseSelect'))
-    if (!(await confirm({ title: t('deleteSelectedConfirm', { n: ids.length }), description: t('irreversible'), destructive: true }))) return
+    if (!(await confirm({ title: t('deleteSelectedConfirm', { n: ids.length }), description: t('irreversible'), destructive: true, confirmText: t('delete') }))) return
     const toastId = toast.loading(t('deleting', { done: 0, total: ids.length }))
     let done = 0
     try {

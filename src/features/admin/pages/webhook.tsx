@@ -26,7 +26,6 @@ const messages = defineMessages({
     webhookAllowListDesc: '请输入允许使用 webhook 的邮箱地址。',
     manualInputPrompt: '输入后按回车键添加',
     notEnabled: 'Webhook 未开启',
-    successTip: '成功',
     retry: '重试',
     allowListOffHint: '白名单未启用时，所有邮箱地址都可以使用 Webhook。',
   },
@@ -40,7 +39,6 @@ const messages = defineMessages({
     webhookAllowListDesc: 'Mail addresses that are allowed to use webhook.',
     manualInputPrompt: 'Type and press Enter to add',
     notEnabled: 'Webhook is not enabled',
-    successTip: 'Success',
     retry: 'Retry',
     allowListOffHint: 'While the allow list is off, every address can use webhook.',
   },
@@ -101,7 +99,7 @@ function AdminWebhookForm({ initial }: { initial: AdminWebhookSettings }) {
     try {
       await api.post('/admin/webhook/settings', settings)
       queryClient.setQueryData(QUERY_KEY, settings)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

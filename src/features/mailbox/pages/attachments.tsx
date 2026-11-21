@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CloudIcon, DownloadIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react'
+import { CircleAlertIcon, CloudIcon, CloudOffIcon, DownloadIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,7 +20,10 @@ const messages = defineMessages({
     key: '文件',
     empty: '还没有保存任何附件',
     deleteConfirm: '确定要删除此附件吗？',
-    deleteSuccess: '删除成功',
+    disabledTitle: '未启用 S3 附件',
+    disabledDesc: '站点没有配置 S3 存储，暂时无法保存附件。',
+    loadFailed: '附件列表加载失败',
+    retry: '重试',
   },
   en: {
     title: 'S3 attachments',
@@ -28,7 +31,10 @@ const messages = defineMessages({
     key: 'File',
     empty: 'No attachments saved yet',
     deleteConfirm: 'Delete this attachment?',
-    deleteSuccess: 'Deleted',
+    disabledTitle: 'S3 attachments are off',
+    disabledDesc: 'This site has no S3 storage configured, so attachments cannot be saved.',
+    loadFailed: 'Could not load attachments',
+    retry: 'Retry',
   },
 })
 
@@ -36,7 +42,10 @@ const messages = defineMessages({
 export default function AttachmentsPage() {
   const t = useT(messages)
   const address = useApp((s) => s.addressSettings.address)
+  // the nav hides this page without S3, but a direct link still lands here: say so instead of requesting (500)
+  const s3Enabled = useApp((s) => s.openSettings.isS3Enabled)
   const query = useQuery({
+    enabled: s3Enabled,
     queryKey: ['mailbox', address, 'attachments'],
     queryFn: async () => (await api.get<{ results?: { key: string }[] }>('/api/attachment/list')).results || [],
   })
@@ -51,10 +60,10 @@ export default function AttachmentsPage() {
   }
 
   const remove = async (key: string) => {
-    if (!(await confirm({ title: t('deleteConfirm'), description: key, destructive: true }))) return
+    if (!(await confirm({ title: t('deleteConfirm'), description: key, destructive: true, confirmText: t('delete') }))) return
     try {
       await api.post('/api/attachment/delete', { key })
-      toast.success(t('deleteSuccess'))
+      toast.success(t('deleted'))
       await query.refetch()
     } catch (error) {
       toast.error(errorMessage(error))
@@ -68,14 +77,25 @@ export default function AttachmentsPage() {
         title={t('title')}
         description={t('description')}
         actions={
-          <Button variant="outline" onClick={() => query.refetch()}>
-            <RefreshCwIcon className={cn(query.isFetching && 'animate-spin')} />
-            {t('refresh')}
-          </Button>
+          s3Enabled && (
+            <Button variant="outline" onClick={() => query.refetch()}>
+              <RefreshCwIcon className={cn(query.isFetching && 'animate-spin')} />
+              {t('refresh')}
+            </Button>
+          )
         }
       />
-      {query.isLoading ? (
+      {!s3Enabled ? (
+        <EmptyState icon={<CloudOffIcon />} title={t('disabledTitle')} description={t('disabledDesc')} className="rounded-xl border" />
+      ) : query.isLoading ? (
         <Skeleton className="h-48 w-full rounded-xl" />
+      ) : query.isError ? (
+        <EmptyState icon={<CircleAlertIcon />} title={t('loadFailed')} description={errorMessage(query.error)} className="rounded-xl border">
+          <Button variant="outline" onClick={() => query.refetch()}>
+            <RefreshCwIcon />
+            {t('retry')}
+          </Button>
+        </EmptyState>
       ) : rows.length === 0 ? (
         <EmptyState icon={<CloudIcon />} title={t('empty')} className="rounded-xl border" />
       ) : (

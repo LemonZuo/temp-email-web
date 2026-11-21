@@ -43,7 +43,6 @@ const messages = defineMessages({
     title: 'OAuth2 登录',
     description: '配置用户中心的第三方 OAuth2 登录提供方。',
     tip: '第三方登录会自动使用用户邮箱注册账号(邮箱相同将视为同一账号), 此账号和注册的账号相同, 也可以通过忘记密码设置密码',
-    successTip: '保存成功',
     addOauth2: '添加 Oauth2',
     addOauth2Desc: '选择模板会预填常用的端点地址，之后仍可修改。',
     oauth2Type: 'Oauth2 类型',
@@ -76,7 +75,6 @@ const messages = defineMessages({
     title: 'OAuth2 login',
     description: 'Configure third-party OAuth2 login providers for the user center.',
     tip: "Third-party login will automatically use the user's email to register an account (the same email will be regarded as the same account), this account is the same as the registered account, and you can also set the password through the forget password",
-    successTip: 'Save Success',
     addOauth2: 'Add Oauth2',
     addOauth2Desc: 'Templates pre-fill the usual endpoints; you can still edit them afterwards.',
     oauth2Type: 'Oauth2 Type',
@@ -256,7 +254,7 @@ export default function Oauth2SettingsPage() {
 
   const removeProvider = async (index: number) => {
     const name = draft?.[index]?.name || t('untitled')
-    if (!(await confirm({ title: t('deleteConfirm', { name }), description: t('deleteConfirmDesc'), destructive: true }))) return
+    if (!(await confirm({ title: t('deleteConfirm', { name }), description: t('deleteConfirmDesc'), destructive: true, confirmText: t('delete') }))) return
     setDraft((d) => d?.filter((_, i) => i !== index))
     setOpenIndex((open) => (open === null || open === index ? null : open > index ? open - 1 : open))
   }
@@ -282,7 +280,7 @@ export default function Oauth2SettingsPage() {
     setSaving(true)
     try {
       await api.post('/admin/user_oauth2_settings', draft)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       setShowErrors(false)
       await settings.refetch()
     } catch (error) {

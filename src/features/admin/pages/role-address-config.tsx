@@ -19,7 +19,6 @@ const messages = defineMessages({
   zh: {
     title: '角色地址配置',
     roleConfigDesc: '为每个用户角色配置最大地址数量。角色配置优先于全局设置。设置为 0 表示不限制。',
-    successTip: '成功',
     role: '角色',
     domains: '可用域名',
     prefix: '前缀',
@@ -37,7 +36,6 @@ const messages = defineMessages({
     title: 'Role addresses',
     roleConfigDesc:
       'Configure maximum address count for each user role. Role-based limits take priority over global settings. Set 0 for unlimited.',
-    successTip: 'Success',
     role: 'Role',
     domains: 'Domains',
     prefix: 'Prefix',
@@ -100,7 +98,7 @@ export default function RoleAddressConfigPage() {
     setSaving(true)
     try {
       await api.post('/admin/role_address_config', { configs })
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       await settings.refetch()
     } catch (error) {
       toast.error(errorMessage(error))

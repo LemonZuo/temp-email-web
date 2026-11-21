@@ -17,7 +17,6 @@ const messages = defineMessages({
   zh: {
     title: 'AI 邮件提取设置',
     description: '控制哪些邮箱地址可以使用 AI 提取验证码、链接等信息。',
-    successTip: '成功',
     section: '地址白名单',
     enableAllowList: '启用地址白名单',
     enableAllowListTip: '启用后，AI 提取功能仅对白名单中的邮箱地址生效',
@@ -29,7 +28,6 @@ const messages = defineMessages({
   en: {
     title: 'AI Email Extraction Settings',
     description: 'Control which addresses can use AI extraction of codes, links and more.',
-    successTip: 'Success',
     section: 'Address allowlist',
     enableAllowList: 'Enable Address Allowlist',
     enableAllowListTip: 'When enabled, AI extraction will only process emails sent to addresses in the allowlist',
@@ -65,7 +63,7 @@ export default function AiExtractPage() {
     setSaving(true)
     try {
       await api.post('/admin/ai_extract/settings', draft)
-      toast.success(t('successTip'))
+      toast.success(t('saved'))
       await settings.refetch()
     } catch (error) {
       toast.error(errorMessage(error))

@@ -311,7 +311,7 @@ export default function RedeemCodesPage() {
     if (!(await confirm({ title: t('deleteConfirm'), description: row.code, destructive: true, confirmText: t('delete') }))) return
     try {
       await api.delete(`/admin/redeem_codes/${row.id}`)
-      toast.success(t('success'))
+      toast.success(t('deleted'))
       await refresh()
     } catch (error) {
       toast.error(errorMessage(error))
