@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { QueryKey } from '@tanstack/react-query'
 import { ArrowLeftIcon, Code2Icon, RefreshCwIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -31,6 +31,7 @@ const messages = defineMessages({
     emptyDesc: '发送的邮件会显示在这里',
     noMatch: '没有匹配的邮件',
     selectMail: '选择一封已发送邮件',
+    selectMailDesc: '从左侧列表中选择邮件查看内容',
     to: '收件人',
     from: '发件地址',
     noSubject: '（无主题）',
@@ -43,6 +44,7 @@ const messages = defineMessages({
     emptyDesc: 'Mails you send will show up here',
     noMatch: 'No matching mails',
     selectMail: 'Select a sent mail',
+    selectMailDesc: 'Choose a mail from the list to view it here',
     to: 'To',
     from: 'From',
     noSubject: '(no subject)',
@@ -146,12 +148,8 @@ export function SendboxWorkspace({ queryKey, fetchMails, deleteMail, showSender,
     if (!kw) return paged.items
     return paged.items.filter((m) => [m.subject, m.toMail, m.content].some((f) => (f || '').toLowerCase().includes(kw)))
   }, [paged.items, keyword])
+  // nothing is opened until the user picks a mail (same as the inbox)
   const selected = filtered.find((m) => m.id === selectedId) || null
-
-  useEffect(() => {
-    if (isMobile) return
-    if (filtered.length > 0 && !filtered.some((m) => m.id === selectedId)) setSelectedId(filtered[0].id)
-  }, [filtered, isMobile, selectedId])
 
   const onDelete =
     deleteMail && selected
@@ -243,7 +241,7 @@ export function SendboxWorkspace({ queryKey, fetchMails, deleteMail, showSender,
       onDelete={onDelete}
     />
   ) : (
-    <EmptyState className="h-full" icon={<SendIcon />} title={t('selectMail')} />
+    <EmptyState className="h-full" icon={<SendIcon />} title={t('selectMail')} description={t('selectMailDesc')} />
   )
 
   return <ThreePane list={list} reader={reader} hasSelection={!!selected} />
