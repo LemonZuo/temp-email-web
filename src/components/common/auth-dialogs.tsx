@@ -83,11 +83,9 @@ function PasswordDialog({
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="dialog-secret">{t('password')}</FieldLabel>
-              {/* shared site / admin secret: no saved-password dropdown or save prompt (would list unrelated logins) */}
+              <FieldLabel htmlFor="dialog-password">{t('password')}</FieldLabel>
               <PasswordInput
-                id="dialog-secret"
-                noAutofill
+                id="dialog-password"
                 autoFocus
                 value={password}
                 placeholder={t('passwordPlaceholder')}
