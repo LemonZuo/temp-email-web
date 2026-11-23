@@ -3,12 +3,13 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 
 /**
- * Keeps a real password field away from password managers. Chrome ignores `autocomplete="off"` on password
- * fields, but skips one-time-code fields both when filling and when offering to save; the data attributes do the
- * same for 1Password, LastPass, Bitwarden and Dashlane.
+ * Keeps a real password field away from saved logins. Chrome ignores `autocomplete="off"` on password fields and
+ * still listed saved accounts on a `one-time-code` field; `new-password` stops it from filling saved passwords
+ * (it may offer to generate one instead). The data attributes do the same for 1Password, LastPass, Bitwarden and
+ * Dashlane.
  */
 const NO_AUTOFILL = {
-  autoComplete: 'one-time-code',
+  autoComplete: 'new-password',
   'data-1p-ignore': true,
   'data-lpignore': 'true',
   'data-bwignore': true,
