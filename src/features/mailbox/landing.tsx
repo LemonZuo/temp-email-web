@@ -218,15 +218,16 @@ export function MailboxLanding() {
             )}
           </div>
         </div>
-        {/* phones hide the hero, so the copyright lives here too; the admin link is the one-tap way in on a new device */}
+        {/* phones hide the hero, so the copyright lives here too; the admin link is the phone's way in on a new device
+            (wider screens use the hidden logo clicks instead, so it is hidden from md up) */}
         <footer className="flex items-center justify-center gap-1 px-4 pb-4 text-xs text-muted-foreground lg:justify-end lg:px-6">
           <span className="lg:hidden">© {YEAR} {openSettings.copyright}</span>
           {!showAdminPage && !telegram && (
             <>
-              <span aria-hidden className="lg:hidden">
+              <span aria-hidden className="md:hidden">
                 ·
               </span>
-              <Link to={adminPath()} className="inline-flex h-9 items-center px-1 hover:text-foreground hover:underline">
+              <Link to={adminPath()} className="inline-flex h-9 items-center px-1 hover:text-foreground hover:underline md:hidden">
                 {t('adminLogin')}
               </Link>
             </>

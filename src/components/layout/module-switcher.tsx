@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { adminPath } from '@/features/admin/paths'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { useApp, useFlags } from '@/store/app'
 import { defineMessages, useT } from '@/i18n'
@@ -31,15 +32,15 @@ const messages = defineMessages({
 const ADMIN_TAPS = 5
 /** Taps further apart than this start a new count */
 const TAP_WINDOW_MS = 3000
-/** Holding the logo this long opens the console right away (five quick taps are hard on a phone) */
+/** Holding the logo this long opens the console right away */
 const LONG_PRESS_MS = 700
 
 /**
- * Hidden admin entry: tapping the site logo 5 times (kept from the old frontend) or pressing and holding it opens
- * the admin console, which asks for the admin password when needed. Returns the logo's event handlers.
+ * Hidden admin entry on wide screens: clicking the site logo 5 times (kept from the old frontend) or pressing and
+ * holding it opens the admin console, which asks for the admin password when needed. Phones use the footer's
+ * 管理员登录 link instead, so taps on the logo do nothing there. Returns the logo's event handlers.
  */
-// At the bottom: a top toast spans the phone screen and covers the logo (its close button sat right on it), so
-// every other tap hit the toast instead.
+// At the bottom, clear of the logo: a toast over it would catch the next clicks.
 const tapToast = { id: 'admin-logo-tap', duration: 1500, position: 'bottom-center' } as const
 
 function useAdminLogoGesture(isolate: boolean) {
@@ -97,18 +98,21 @@ export function Logo({
   isolate = false,
 }: {
   className?: string
-  /** Count taps towards the hidden admin entry (off inside the admin console) */
+  /** Count clicks towards the hidden admin entry (off inside the admin console; always off on phones) */
   adminTap?: boolean
-  /** Keep taps from reaching a parent control (e.g. the module switcher's dropdown trigger) */
+  /** Keep clicks from reaching a parent control (e.g. the module switcher's dropdown trigger) */
   isolate?: boolean
 }) {
   const gesture = useAdminLogoGesture(isolate)
+  // phones get the footer link (sidebar / landing) instead of the hidden gesture; `undefined` until measured
+  const isMobile = useIsMobile()
+  adminTap = adminTap && isMobile === false
   return (
     <div
       className={cn(
         'relative flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground select-none',
-        // touch-manipulation: quick taps must not be taken as double-tap zoom (iOS swallowed them);
-        // the invisible ::after grows a small logo to a 44px tap area (not inside the module switcher button)
+        // touch-manipulation: quick taps on a touch screen (tablets) must not be taken as double-tap zoom;
+        // the invisible ::after grows a small logo's click area (not inside the module switcher button)
         adminTap && 'touch-manipulation [-webkit-touch-callout:none]',
         adminTap && !isolate && "after:absolute after:-inset-2 after:content-['']",
         className,
@@ -131,6 +135,7 @@ export function ModuleSwitcher({ current }: { current: ModuleKey }) {
   const { isMobile, state } = useSidebar()
   const title = useApp((s) => s.openSettings.title) || t('defaultTitle')
   // When the sidebar is collapsed to icons the logo is the whole button, so it must keep opening the menu.
+  // (On phones the logo ignores clicks anyway: the footer link is the way in.)
   const logoTap = current !== 'admin' && (isMobile || state === 'expanded')
   const { showUserSystem, showAdminPage } = useFlags()
   const modules: { key: ModuleKey; label: string; icon: LucideIcon; url: string; show: boolean }[] = [

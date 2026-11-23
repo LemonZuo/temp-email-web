@@ -20,7 +20,10 @@ const messages = defineMessages({
   en: { status: 'Status', github: 'GitHub', adminLogin: 'Admin login' },
 })
 
-/** `adminLink`: offer the admin console next to the copyright while no visible admin entry exists (new device). */
+/**
+ * `adminLink`: offer the admin console next to the copyright while no visible admin entry exists (new device).
+ * Phones only: on wider screens the hidden logo clicks are the entry.
+ */
 export function SidebarFooterLinks({ adminLink = true }: { adminLink?: boolean }) {
   const t = useT(messages)
   const openSettings = useApp((s) => s.openSettings)
@@ -57,8 +60,10 @@ export function SidebarFooterLinks({ adminLink = true }: { adminLink?: boolean }
         </span>
         {adminLink && !showAdminPage && (
           <>
-            <span aria-hidden>·</span>
-            <Link to={adminPath()} className="inline-flex h-7 shrink-0 items-center hover:text-foreground hover:underline">
+            <span aria-hidden className="md:hidden">
+              ·
+            </span>
+            <Link to={adminPath()} className="inline-flex h-7 shrink-0 items-center hover:text-foreground hover:underline md:hidden">
               {t('adminLogin')}
             </Link>
           </>
